@@ -21,10 +21,10 @@ void logger_set_level(log_level_t level);
 
 void log_print(log_level_t level, const char *fmt, ...);
 
-#define LOGE(...) log_print(LOG_LEVEL_ERROR, "E: " __VA_ARGS__)
-#define LOGW(...) log_print(LOG_LEVEL_WARN,  "W: " __VA_ARGS__)
-#define LOGI(...) log_print(LOG_LEVEL_INFO,  "I: " __VA_ARGS__)
-#define LOGD(...) log_print(LOG_LEVEL_DEBUG, "D: " __VA_ARGS__)
+#define LOGE(...) log_print(LOG_LEVEL_ERROR,  __VA_ARGS__)
+#define LOGW(...) log_print(LOG_LEVEL_WARN,   __VA_ARGS__)
+#define LOGI(...) log_print(LOG_LEVEL_INFO,   __VA_ARGS__)
+#define LOGD(...) log_print(LOG_LEVEL_DEBUG,  __VA_ARGS__)
 
 #ifdef __cplusplus
 }

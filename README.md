@@ -10,5 +10,5 @@ A lightweight, modular logger library for both **C** and **C++**, designed to wo
 - 📦 CMake-based build system
 - 🔍 Simple integration & testable structure
 
-## 📁 Project Structure
+<!-- ## 📁 Project Structure -->
 
