@@ -1,4 +1,4 @@
-name: Build Logger Project
+name: Build Logger Project with CMake
 
 on:
   push:
@@ -16,12 +16,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Install build tools
-      run: sudo apt-get update && sudo apt-get install -y build-essential
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential cmake
+
+    - name: Configure CMake
+      run: cmake -S . -B build
 
     - name: Build project
-      run: |
-        gcc -Wall -o logger src/logger.c src/main.c
+      run: cmake --build build -- -j$(nproc)
 
-    - name: Run logger binary (optional test)
-      run: ./logger
+    - name: Run tests (nếu có)
+      run: |
+        if [ -f build/tests/logger_tests ]; then
+          ./build/tests/logger_tests
+        else
+          echo "No test executable found, skip."
+        fi
