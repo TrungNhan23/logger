@@ -25,10 +25,12 @@ jobs:
     - name: Build project
       run: cmake --build build -- -j$(nproc)
 
-    - name: Run tests (nếu có)
+    - name: Run all tests
       run: |
-        if [ -f build/tests/logger_tests ]; then
-          ./build/tests/logger_tests
-        else
-          echo "No test executable found, skip."
-        fi
+        echo "Running all tests..."
+        for testfile in build/test/*; do
+          if [ -x "$testfile" ]; then   # kiểm tra file có quyền chạy
+            echo "Running $testfile"
+            $testfile || exit 1         # chạy test nếu fail thì dừng workflow
+          fi
+        done
