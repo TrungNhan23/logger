@@ -27,10 +27,9 @@ jobs:
 
     - name: Run all tests
       run: |
-        echo "Running all tests..."
-        for testfile in build/test/*; do
-          if [ -x "$testfile" ]; then   # kiểm tra file có quyền chạy
+        for testfile in build/tests/*; do
+          if [ -f "$testfile" ] && [ -x "$testfile" ]; then
             echo "Running $testfile"
-            $testfile || exit 1         # chạy test nếu fail thì dừng workflow
+            "$testfile" || exit 1
           fi
         done
