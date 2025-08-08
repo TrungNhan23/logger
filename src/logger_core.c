@@ -5,7 +5,6 @@
 
 static log_level_t current_level = LOGGER_DEFAULT_LEVEL;
 
-// Platform-specific output
 extern void logger_platform_output(const char *str);
 
 void logger_init(void) {
