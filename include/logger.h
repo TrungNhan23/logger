@@ -2,7 +2,8 @@
 #define LOGGER_H
 
 #include <stdint.h>
-#include "logger_config.h"
+#include <list>
+#include "ILogBackend.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,17 +15,18 @@ typedef enum {
     LOG_LEVEL_WARN,
     LOG_LEVEL_INFO,
     LOG_LEVEL_DEBUG,
-} log_level_t;
+} logLevel;
 
-void logger_init(void);
-void logger_set_level(log_level_t level);
 
-void log_print(log_level_t level, const char *fmt, ...);
-
-#define LOGE(...) log_print(LOG_LEVEL_ERROR,  __VA_ARGS__)
-#define LOGW(...) log_print(LOG_LEVEL_WARN,   __VA_ARGS__)
-#define LOGI(...) log_print(LOG_LEVEL_INFO,   __VA_ARGS__)
-#define LOGD(...) log_print(LOG_LEVEL_DEBUG,  __VA_ARGS__)
+class Logger : public ILogBackend {
+public: 
+    void log(logLevel level, std::string message); 
+    void setLevel(logLevel level);
+    void addBackend(ILogBackend backend);
+private:
+    logLevel LogLevel; 
+    std::list<ILogBackend> backends;
+};
 
 #ifdef __cplusplus
 }
