@@ -1,10 +1,6 @@
 pipeline {
     agent any
-
-    tools {
-        // Nếu Jenkins đã cài đặt trước CMake/GCC thì có thể gọi trực tiếp
-    }
-
+    
     stages {
         stage('Checkout') {
             steps {
