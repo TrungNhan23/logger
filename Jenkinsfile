@@ -1,6 +1,6 @@
 pipeline {
     agent any
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -12,8 +12,8 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh '''
-                    sudo apt-get update
-                    sudo apt-get update && sudo apt-get install -y build-essential cmake libgtest-dev
+                    apt-get update
+                    apt-get update && sudo apt-get install -y build-essential cmake libgtest-dev
                 '''
             }
         }
