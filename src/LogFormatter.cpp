@@ -14,7 +14,13 @@ std::string LogFormatter::format(logLevel level, std::string message)
         case logLevel::LOG_LEVEL_WARN: lvl = "WARNING"; break;
         case logLevel::LOG_LEVEL_ERROR: lvl = "ERROR"; break;
     }
-
-    return std::string(std::ctime(&timeNow)) + " [" + lvl + "] " + message;
+    std::string ts = std::ctime(&timeNow);
+    
+    if (!ts.empty() && ts.back() == '\n') 
+    {
+        ts.pop_back();
+    
+    }
+    return ts + " [" + lvl + "] " + message;
 
 }
