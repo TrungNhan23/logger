@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh '''
                     sudo apt-get update
-                    sudo apt-get install -y cmake g++ make
+                    sudo apt-get update && sudo apt-get install -y build-essential cmake libgtest-dev
                 '''
             }
         }
@@ -25,10 +25,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    mkdir -p build
-                    cd build
-                    cmake ..
-                    make -j$(nproc)
+                    cmake --build build -- -j$(nproc)
                 '''
             }
         }
@@ -37,7 +34,12 @@ pipeline {
             steps {
                 sh '''
                     cd build
-                    ctest --output-on-failure
+                    for testfile in build/tests/*; do
+                        if [ -f "$testfile" ] && [ -x "$testfile" ]; then
+                            echo "Running $testfile"
+                            "$testfile" || exit 1
+                    fi
+                    done
                 '''
             }
         }
