@@ -6,13 +6,14 @@
 #endif
 
 
-#include "logger_config.h"
-#include <stdint.h>
+// #include "logger.h"
 
-// NOTE: You must implement this for your specific MCU (e.g., HAL_UART_Transmit)
+// Hàm gửi từng ký tự ra UART (bạn cần tự triển khai cho MCU của mình)
+// extern void mcu_uart_putchar(char c);
 
-void logger_platform_output(const char *str) {
-    while (*str) {
-        mcu_uart_putchar(*str++);
-    }
-}
+// void logger_platform_output(const char *str) {
+//     while (*str) {
+//         mcu_uart_putchar(*str++);
+//     }
+//     mcu_uart_putchar('\n'); // Thêm ký tự xuống dòng nếu cần
+// }

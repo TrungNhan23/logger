@@ -3,7 +3,7 @@
 #include <string>
 #include "logger.h" 
 
-class LogFormater {
+class LogFormatter {
 public: 
-    std::string format(logLevel level, std::string message);    
-}
+    static std::string format(logLevel level, std::string message);    
+};

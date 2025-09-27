@@ -2,12 +2,11 @@
 #define LOGGER_H
 
 #include <stdint.h>
-#include <list>
 #include "ILogBackend.h"
+#include <memory>
+#include <vector>
+#include <string>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 typedef enum {
     LOG_LEVEL_NONE = 0,
@@ -18,18 +17,16 @@ typedef enum {
 } logLevel;
 
 
-class Logger : public ILogBackend {
+class Logger {
 public: 
-    void log(logLevel level, std::string message); 
+    Logger() : LogLevel(logLevel::LOG_LEVEL_INFO) {}
+    void log(logLevel level, const std::string& message); 
     void setLevel(logLevel level);
-    void addBackend(ILogBackend backend);
+    void addBackend(std::shared_ptr<ILogBackend> backend);
 private:
     logLevel LogLevel; 
-    std::list<ILogBackend> backends;
+    std::vector<std::shared_ptr<ILogBackend>> backends;
 };
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif // LOGGER_H

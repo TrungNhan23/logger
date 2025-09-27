@@ -2,10 +2,13 @@
 
 #include <string>
 #include "ILogBackend.h" 
+#include <fstream>
 
 class FileBackend : public ILogBackend {
 public: 
-    void write(std::string formattedMsg) override; 
+    FileBackend(const std::string& filename); 
+    void write(const std::string& formattedMsg) override; 
 private: 
-    std::string filePath;
+    // std::string filePath;
+    std::ofstream file;
 };
