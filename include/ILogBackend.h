@@ -3,7 +3,8 @@
 #include <string>
 
 
-class ILogBackend {
+class ILogBackend 
+{
 public:
     ILogBackend() = default;
     ILogBackend(const ILogBackend&) = default;

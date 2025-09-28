@@ -7,7 +7,8 @@
 #include <cstdio>
 
 // Helper: read file content
-std::string readFile(const std::string& path) {
+std::string readFile(const std::string& path) 
+{
     std::ifstream in(path);
     std::ostringstream ss;
     ss << in.rdbuf();
@@ -15,7 +16,8 @@ std::string readFile(const std::string& path) {
 }
 
 // Test case 1: Logger with ConsoleBackend
-TEST(LoggerTest, LogToConsole) {
+TEST(LoggerTest, LogToConsole) 
+{
     Logger logger;
     logger.setLevel(logLevel::LOG_LEVEL_DEBUG);
 
@@ -27,7 +29,8 @@ TEST(LoggerTest, LogToConsole) {
 }
 
 // Test case 2: Logger with FileBackend
-TEST(LoggerTest, LogToFile) {
+TEST(LoggerTest, LogToFile) 
+{
     std::string path = "test_output.log";
 
     Logger logger;
@@ -46,7 +49,8 @@ TEST(LoggerTest, LogToFile) {
 }
 
 // Test case 3: Log Level Filtering (UC04)
-TEST(LoggerTest, LogLevelFilter) {
+TEST(LoggerTest, LogLevelFilter) 
+{
     std::string path = "filter_test.log";
 
     Logger logger;

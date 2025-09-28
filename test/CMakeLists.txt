@@ -24,7 +24,6 @@ set(TEST_TARGETS
     test_c
 )
 
-
 # --- add GoogleTest target ---
 add_executable(test_logger ${CMAKE_SOURCE_DIR}/test/test_logger.cpp)
 target_sources(test_logger PRIVATE ${LOGGER_SOURCES})

@@ -4,7 +4,8 @@
 
 static logLevel currentLevel = LOG_LEVEL_DEBUG;
 
-int main() {
+int main() 
+{
     Logger logger;
 
     // add console backend

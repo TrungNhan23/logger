@@ -2,7 +2,8 @@
 #include "ConsoleBackend.h"
 #include "FileBackend.h"
 
-int main() {
+int main() 
+{
     Logger logger;
 
     // add console backend

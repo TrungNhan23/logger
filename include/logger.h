@@ -8,16 +8,18 @@
 #include <string>
 
 
-typedef enum {
+typedef enum 
+{
     LOG_LEVEL_NONE = 0,
     LOG_LEVEL_ERROR,
     LOG_LEVEL_WARN,
     LOG_LEVEL_INFO,
     LOG_LEVEL_DEBUG,
-} logLevel;
+}   logLevel;
 
 
-class Logger {
+class Logger 
+{
 public: 
     Logger() = default;
     void log(logLevel level, const std::string& message); 

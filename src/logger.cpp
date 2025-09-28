@@ -14,7 +14,8 @@ void Logger::log(logLevel level, const std::string& message)
     }
 
     auto formatted = LogFormatter::format(level, message);
-    for (auto& backend : backends) {
+    for (auto& backend : backends) 
+    {
         backend->write(formatted);
     }
 }
