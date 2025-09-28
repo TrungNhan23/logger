@@ -1,7 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include "ILogBackend.h"
 #include <memory>
 #include <vector>
@@ -19,12 +19,12 @@ typedef enum {
 
 class Logger {
 public: 
-    Logger() : LogLevel(logLevel::LOG_LEVEL_INFO) {}
+    Logger() = default;
     void log(logLevel level, const std::string& message); 
     void setLevel(logLevel level);
     void addBackend(std::shared_ptr<ILogBackend> backend);
 private:
-    logLevel LogLevel; 
+    logLevel LogLevel = logLevel::LOG_LEVEL_INFO; 
     std::vector<std::shared_ptr<ILogBackend>> backends;
 };
 
