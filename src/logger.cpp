@@ -8,7 +8,7 @@ void Logger::setLevel(logLevel level)
 
 void Logger::log(logLevel level, const std::string& message)
 {
-    // if (level < logLevel) return;
+    if (level > LogLevel) return;
     LogFormatter formatter;
     std::string formatted = formatter.format(level, message);
     for (auto& backend : backends) {

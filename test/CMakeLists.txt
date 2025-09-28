@@ -1,48 +1,52 @@
 # test/CMakeLists.txt
 
-# Create test executable for C
-# add_executable(test_c test_c.c)
-# target_include_directories(test_c PRIVATE
-#     ${CMAKE_SOURCE_DIR}/include
-#     ${CMAKE_SOURCE_DIR}/config
-#     ${CMAKE_SOURCE_DIR}/platform
-# )
-# target_sources(test_c PRIVATE
-#     ${CMAKE_SOURCE_DIR}/src/logger_core.c
-#     ${CMAKE_SOURCE_DIR}/src/logger_linux.c
-# )
-# target_compile_definitions(test_c PRIVATE PLATFORM_LINUX)
+enable_testing()
+find_package(GTest REQUIRED)
 
-# Create test executable for C++
-add_executable(test_cpp test_cpp.cpp)
-target_include_directories(test_cpp PRIVATE
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/config
-    ${CMAKE_SOURCE_DIR}/platform
-)
-target_sources(test_cpp PRIVATE
+set(LOGGER_SOURCES
     ${CMAKE_SOURCE_DIR}/src/logger_core.c
     ${CMAKE_SOURCE_DIR}/src/logger_linux.c
     ${CMAKE_SOURCE_DIR}/src/logger.cpp        
     ${CMAKE_SOURCE_DIR}/src/FileBackend.cpp   
     ${CMAKE_SOURCE_DIR}/src/LogFormatter.cpp   
-    ${CMAKE_SOURCE_DIR}/src/ConsoleBackend.cpp   
-
+    ${CMAKE_SOURCE_DIR}/src/ConsoleBackend.cpp
 )
-target_compile_definitions(test_cpp PRIVATE PLATFORM_LINUX)
-set_target_properties(test_cpp PROPERTIES LINKER_LANGUAGE CXX)
+
+set(LOGGER_INCLUDES
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/platform
+)
+
+set(TEST_TARGETS
+    test_core
+    test_cpp
+    test_c
+)
 
 
-# add_executable(test_core test_core.cpp)
-# target_link_libraries(test_core PRIVATE gtest gtest_main pthread)
-# target_include_directories(test_core PRIVATE
-#     ${CMAKE_SOURCE_DIR}/include
-#     ${CMAKE_SOURCE_DIR}/config
-#     ${CMAKE_SOURCE_DIR}/platform
-# )
-# target_sources(test_core PRIVATE
-#     ${CMAKE_SOURCE_DIR}/src/logger_core.c
-#     # ${CMAKE_SOURCE_DIR}/src/logger_linux.c
-# )
-# target_compile_definitions(test_core PRIVATE PLATFORM_LINUX)
-# set_target_properties(test_core PROPERTIES LINKER_LANGUAGE CXX)
+# --- add GoogleTest target ---
+add_executable(test_logger ${CMAKE_SOURCE_DIR}/test/test_logger.cpp)
+target_sources(test_logger PRIVATE ${LOGGER_SOURCES})
+target_include_directories(test_logger PRIVATE ${LOGGER_INCLUDES})
+target_compile_definitions(test_logger PRIVATE PLATFORM_LINUX)
+target_link_libraries(test_logger PRIVATE GTest::gtest_main)
+
+include(GoogleTest)
+gtest_discover_tests(test_logger)
+
+# --- add other plain tests ---
+file(GLOB TEST_SOURCES
+    "${CMAKE_SOURCE_DIR}/test/*.[cC]"
+    "${CMAKE_SOURCE_DIR}/test/*.[cC][pP][pP]"
+)
+# file(GLOB TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/*.[cC]" "${CMAKE_SOURCE_DIR}/test/*.[cC][pP][pP]")
+list(REMOVE_ITEM TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/test_logger.cpp")
+
+foreach(test_file ${TEST_SOURCES})
+    get_filename_component(test_name ${test_file} NAME_WE)
+    add_executable(${test_name} ${test_file})
+    target_sources(${test_name} PRIVATE ${LOGGER_SOURCES})
+    target_include_directories(${test_name} PRIVATE ${LOGGER_INCLUDES})
+    target_compile_definitions(${test_name} PRIVATE PLATFORM_LINUX)
+endforeach()
