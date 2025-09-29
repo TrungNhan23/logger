@@ -2,7 +2,7 @@
 #include "ConsoleBackend.h"
 #include "FileBackend.h"
 
-static logLevel currentLevel = LOG_LEVEL_DEBUG;
+static logLevel currentLevel = logLevel::LOG_LEVEL_DEBUG;
 
 int main() 
 {
