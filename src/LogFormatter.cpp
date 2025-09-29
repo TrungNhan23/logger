@@ -1,11 +1,13 @@
 #include "LogFormatter.h"
+#include "logger.h"
+#include <string>
 #include <chrono>
 #include <ctime>
 
 auto LogFormatter::format(logLevel level, std::string message) -> std::string
 {
     auto now = std::chrono::system_clock::now();
-    std::time_t timeNow = std::chrono::system_clock::to_time_t(now);
+    const std::time_t timeNow = std::chrono::system_clock::to_time_t(now);
 
     std::string lvl;
     switch (level) {
@@ -15,13 +17,13 @@ auto LogFormatter::format(logLevel level, std::string message) -> std::string
         case logLevel::LOG_LEVEL_WARN: lvl = "WARNING"; break;
         case logLevel::LOG_LEVEL_ERROR: lvl = "ERROR"; break;
     }
-    std::string ts = std::ctime(&timeNow);
+    std::string timestamp = std::ctime(&timeNow);
     
-    if (!ts.empty() && ts.back() == '\n') 
+    if (!timestamp.empty() && timestamp.back() == '\n') 
     {
-        ts.pop_back();
+        timestamp.pop_back();
     
     }
-    return ts + " [" + lvl + "] " + message;
+    return timestamp + " [" + lvl + "] " + message;
 
 }

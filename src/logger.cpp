@@ -1,5 +1,7 @@
 #include <logger.h>
 #include <LogFormatter.h>
+#include <string>
+#include <memory>
 
 void Logger::setLevel(logLevel level)
 {
