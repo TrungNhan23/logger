@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <iostream>
 #include "ILogBackend.h" 
 
 class ConsoleBackend : public ILogBackend {

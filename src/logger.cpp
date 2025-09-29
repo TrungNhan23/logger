@@ -1,5 +1,6 @@
 #include <logger.h>
 #include <LogFormatter.h>
+#include "ILogBackend.h"
 #include <string>
 #include <memory>
 

@@ -1,7 +1,6 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <cstdint>
 #include "ILogBackend.h"
 #include <memory>
 #include <vector>

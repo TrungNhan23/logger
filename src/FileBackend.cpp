@@ -1,6 +1,8 @@
 #include "FileBackend.h"
 #include <string>
 #include <fstream>
+#include <ios> 
+#include <ostream> 
 
 
 FileBackend::FileBackend(const std::string& filename)
