@@ -49,4 +49,3 @@ CheckOptions:
 
 HeaderFilterRegex: 'src/.*'
 FormatStyle: file
-AnalyzeTemporaryDtors: false
