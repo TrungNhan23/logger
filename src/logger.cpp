@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-void Logger::setLevel(logLevel level)
+void Logger::set_level(logLevel level)
 {
     this->LogLevel = level;
 }
@@ -23,7 +23,7 @@ void Logger::log(logLevel level, const std::string& message)
     }
 }
 
-void Logger::addBackend(std::shared_ptr<ILogBackend> backend)
+void Logger::add_backend(std::shared_ptr<ILogBackend> backend)
 {
     backends.push_back(backend);
 }

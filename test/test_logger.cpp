@@ -19,11 +19,11 @@ std::string readFile(const std::string& path)
 TEST(LoggerTest, LogToConsole) 
 {
     Logger logger;
-    logger.setLevel(logLevel::LOG_LEVEL_DEBUG);
+    logger.set_level(logLevel::LOG_LEVEL_DEBUG);
 
     // Tạo backend console
     auto consoleBackend = std::make_shared<ConsoleBackend>();
-    logger.addBackend(consoleBackend);
+    logger.add_backend(consoleBackend);
 
     EXPECT_NO_THROW(logger.log(logLevel::LOG_LEVEL_INFO, "Hello Console"));
 }
@@ -34,10 +34,10 @@ TEST(LoggerTest, LogToFile)
     std::string path = "test_output.log";
 
     Logger logger;
-    logger.setLevel(logLevel::LOG_LEVEL_DEBUG);
+    logger.set_level(logLevel::LOG_LEVEL_DEBUG);
 
     auto fileBackend = std::make_shared<FileBackend>(path);
-    logger.addBackend(fileBackend);
+    logger.add_backend(fileBackend);
 
     logger.log(logLevel::LOG_LEVEL_INFO, "File Test 123");
 
@@ -54,10 +54,10 @@ TEST(LoggerTest, LogLevelFilter)
     std::string path = "filter_test.log";
 
     Logger logger;
-    logger.setLevel(logLevel::LOG_LEVEL_WARN); // threshold WARNING
+    logger.set_level(logLevel::LOG_LEVEL_WARN); // threshold WARNING
 
     auto fileBackend = std::make_shared<FileBackend>(path);
-    logger.addBackend(fileBackend);
+    logger.add_backend(fileBackend);
 
     logger.log(logLevel::LOG_LEVEL_INFO, "This is INFO (should be ignored)");
     logger.log(logLevel::LOG_LEVEL_ERROR, "This is ERROR (should appear)");

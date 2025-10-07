@@ -9,10 +9,10 @@ int main()
     Logger logger;
 
     // add console backend
-    logger.addBackend(std::make_shared<ConsoleBackend>());
+    logger.add_backend(std::make_shared<ConsoleBackend>());
 
     // add file backend
-    logger.addBackend(std::make_shared<FileBackend>("test_log_category.txt"));
+    logger.add_backend(std::make_shared<FileBackend>("test_log_category.txt"));
 
     // test log
     logger.log(logLevel::LOG_LEVEL_INFO, "This is INFO");

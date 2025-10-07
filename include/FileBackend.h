@@ -7,7 +7,7 @@
 class FileBackend : public ILogBackend 
 {
 public: 
-    FileBackend(const std::string& filename); 
+    explicit FileBackend(const std::string& filename); 
     void write(const std::string& formattedMsg) override; 
 private: 
     // std::string filePath;
