@@ -13,18 +13,26 @@ option(ENABLE_LINT "Enable linting with clang-tidy" ON)
 
 if(ENABLE_LINT)
     find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-
     if(CLANG_TIDY_EXE)
         message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
 
+        file(GLOB_RECURSE ALL_SOURCE_FILES
+            ${CMAKE_SOURCE_DIR}/src/*.c
+            ${CMAKE_SOURCE_DIR}/src/*.cpp
+            ${CMAKE_SOURCE_DIR}/include/*.h
+        )
+
         add_custom_target(lint
-            COMMAND clang-tidy
+            COMMAND ${CLANG_TIDY_EXE}
                 -p ${CMAKE_BINARY_DIR}
-                ${CMAKE_SOURCE_DIR}/src/*.cpp
-                ${CMAKE_SOURCE_DIR}/include/*.h
+                --use-color
+                --quiet
+                ${ALL_SOURCE_FILES}
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMENT "Running clang-tidy with AUTOSAR-like checks..."
+            VERBATIM
         )
+
     else()
         message(WARNING "clang-tidy not found, 'make lint' will be unavailable")
     endif()

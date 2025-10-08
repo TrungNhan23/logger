@@ -3,7 +3,9 @@ name: Build Logger Project with CMake
 on:
   push:
     branches:
-      - master
+      - 'feature/*'
+      - 'bugfix/*'
+      - 'hotfix/*'
   pull_request:
     branches:
       - master
@@ -13,17 +15,17 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: sudo apt-get update && sudo apt-get install -y build-essential cmake libgtest-dev clang-tidy
+      run: sudo apt-get update -y && sudo apt-get install -y build-essential cmake libgtest-dev clang-tidy
 
     - name: Configure CMake
-      run: cmake -S .  -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      run: cmake -S . -B build -DENABLE_LINT=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
     - name: Check linter
       run: cmake --build build --target lint

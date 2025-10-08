@@ -1,15 +1,51 @@
 Checks: >
-  clang-analyzer-*,
+  -*,
   bugprone-*,
-  cppcoreguidelines-*,
+  clang-analyzer-*,
+  #cppcoreguidelines-*,
+  modernize-*,
+  performance-*,
   readability-*,
   misc-*,
-  modernize-*,
-  -cppcoreguidelines-owning-memory,
-  -cppcoreguidelines-avoid-magic-numbers,
-  -cppcoreguidelines-pro-type-vararg,
-  -readability-magic-numbers
+  hicpp-*,
+  cert-*,
+  portability-*,
+  # tùy chọn nếu code theo AUTOSAR C++14
+  autosar-* 
 
-WarningsAsErrors: '*'
-HeaderFilterRegex: '.*'
+WarningsAsErrors: >
+  bugprone-*,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  cert-*,
+  hicpp-*
+
+CheckOptions:
+  # === General Style / Safety ===
+  - key:             readability-magic-numbers.IgnoredIntegerValues
+    value:           '0,1,-1'
+  - key:             readability-magic-numbers.IgnorePowersOfTwo
+    value:           '1'
+  - key:             readability-identifier-naming.VariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.FunctionCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ClassCase
+    value:           CamelCase
+  - key:             readability-identifier-naming.ConstantCase
+    value:           UPPER_CASE
+
+  # === Performance ===
+  - key:             performance-unnecessary-copy-initialization.WarnOnAllAutoCopies
+    value:           true
+
+  # === Modernization ===
+  - key:             modernize-use-nullptr.NullMacros
+    value:           'NULL,0'
+
+  # === Security ===
+  - key:             cert-err33-c.CheckReturnValueFunctions
+    value:           'fopen,fclose,write,read'
+
+HeaderFilterRegex: 'src/.*'
 FormatStyle: file

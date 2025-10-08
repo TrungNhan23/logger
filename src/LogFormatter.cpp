@@ -4,10 +4,10 @@
 #include <chrono>
 #include <ctime>
 
-auto LogFormatter::format(logLevel level, std::string message) -> std::string
+auto LogFormatter::format(logLevel level, const std::string message) -> std::string
 {
     auto now = std::chrono::system_clock::now();
-    const std::time_t timeNow = std::chrono::system_clock::to_time_t(now);
+    const std::time_t TIME_NOW = std::chrono::system_clock::to_time_t(now);
 
     std::string lvl;
     switch (level) {
@@ -17,7 +17,7 @@ auto LogFormatter::format(logLevel level, std::string message) -> std::string
         case logLevel::LOG_LEVEL_WARN: lvl = "WARNING"; break;
         case logLevel::LOG_LEVEL_ERROR: lvl = "ERROR"; break;
     }
-    std::string timestamp = std::ctime(&timeNow);
+    std::string timestamp = std::ctime(&TIME_NOW);
     
     if (!timestamp.empty() && timestamp.back() == '\n') 
     {

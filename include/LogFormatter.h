@@ -5,5 +5,5 @@
 
 class LogFormatter {
 public: 
-    static auto format(logLevel level, std::string message) -> std::string;    
+    static auto format(logLevel level, const std::string message) -> std::string;    
 };

@@ -7,10 +7,10 @@ int main()
     Logger logger;
 
     // add console backend
-    logger.addBackend(std::make_shared<ConsoleBackend>());
+    logger.add_backend(std::make_shared<ConsoleBackend>());
 
     // add file backend
-    logger.addBackend(std::make_shared<FileBackend>("log.txt"));
+    logger.add_backend(std::make_shared<FileBackend>("log.txt"));
 
     // test log
     logger.log(logLevel::LOG_LEVEL_INFO, "System started");

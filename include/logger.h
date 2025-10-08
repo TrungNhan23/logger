@@ -22,8 +22,8 @@ class Logger
 public: 
     Logger() = default;
     void log(logLevel level, const std::string& message); 
-    void setLevel(logLevel level);
-    void addBackend(std::shared_ptr<ILogBackend> backend);
+    void set_level(logLevel level);
+    void add_backend(std::shared_ptr<ILogBackend> backend);
 private:
     logLevel LogLevel = logLevel::LOG_LEVEL_INFO; 
     std::vector<std::shared_ptr<ILogBackend>> backends;
