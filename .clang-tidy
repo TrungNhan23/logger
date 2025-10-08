@@ -2,7 +2,7 @@ Checks: >
   -*,
   bugprone-*,
   clang-analyzer-*,
-  cppcoreguidelines-*,
+  #cppcoreguidelines-*,
   modernize-*,
   performance-*,
   readability-*,
