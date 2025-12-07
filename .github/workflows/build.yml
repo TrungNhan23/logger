@@ -1,4 +1,4 @@
-name: Build Logger Project with CMake
+name: Build Logger Library for Cross-platform make by Nhen
 
 on:
   push:
@@ -10,8 +10,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '0 2 * * *' 
-
+    - cron: '0 2 * * *'
 
 jobs:
   build:
@@ -22,10 +21,18 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: sudo apt-get update -y && sudo apt-get install -y build-essential cmake libgtest-dev clang-tidy
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y build-essential cmake lcov clang-tidy
 
+    # --- Configure CMake with coverage enabled ---
     - name: Configure CMake
-      run: cmake -S . -B build -DENABLE_LINT=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      run: |
+        cmake -S . -B build \
+              -DENABLE_LINT=ON \
+              -DENABLE_COVERAGE=ON \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
     - name: Check linter
       run: cmake --build build --target lint
@@ -33,11 +40,37 @@ jobs:
     - name: Build project
       run: cmake --build build -- -j$(nproc)
 
+    # --- Run all test binaries in build/test ---
     - name: Run all tests
       run: |
-        for testfile in build/tests/*; do
-          if [ -f "$testfile" ] && [ -x "$testfile" ]; then
-            echo "Running $testfile"
-            "$testfile" || exit 1
-          fi
+        find build/test -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' testfile; do
+          echo "Running $testfile"
+          "$testfile"
         done
+
+    # --- Collect Coverage ---
+    - name: Capture Coverage
+      run: |
+        lcov --capture --directory build --output-file coverage.info
+
+        # Remove unwanted coverage paths
+        lcov --remove coverage.info \
+            '/usr/*' \
+            '*/third-party/googletest/*' \
+            '*/build/test/*' \
+            --output-file coverage.info
+
+        # Show coverage summary in logs
+        lcov --list coverage.info
+
+    # --- Generate HTML report ---
+    - name: Generate Coverage Report
+      run: |
+        genhtml coverage.info --output-directory coverage_report
+
+    # --- Upload as GitHub artifact ---
+    # - name: Upload Coverage Report
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: coverage-report
+    #     path: coverage_report/
