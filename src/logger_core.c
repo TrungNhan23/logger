@@ -19,7 +19,8 @@
 //     return s_log_level;
 // }
 
-// void logger_log(log_level_t level, const char *file, int line, const char *fmt, ...) {
+// void logger_log(log_level_t level, const char *file, int line, const char
+// *fmt, ...) {
 //     if (level > s_log_level) return;
 
 //     const char* level_str = "";
@@ -38,7 +39,8 @@
 //     va_end(args);
 
 //     char final_msg[320];
-//     snprintf(final_msg, sizeof(final_msg), "[%s] %s:%d %s", level_str, file, line, msg);
+//     snprintf(final_msg, sizeof(final_msg), "[%s] %s:%d %s", level_str, file,
+//     line, msg);
 
 //     logger_platform_output(final_msg);
 // }

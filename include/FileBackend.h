@@ -1,15 +1,17 @@
 #pragma once
 
-#include <string>
-#include "ILogBackend.h" 
 #include <fstream>
+#include <string>
 
-class FileBackend : public ILogBackend 
+#include "ILogBackend.h"
+
+class FileBackend : public ILogBackend
 {
-public: 
-    explicit FileBackend(const std::string& filename); 
-    void write(const std::string& formattedMsg) override; 
-private: 
-    // std::string filePath;
-    std::ofstream file;
+public:
+  explicit FileBackend(const std::string &filename);
+  void write(const std::string &formattedMsg) override;
+
+private:
+  // std::string filePath;
+  std::ofstream file;
 };

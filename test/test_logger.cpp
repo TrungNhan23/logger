@@ -1,71 +1,73 @@
 #include <gtest/gtest.h>
-#include "logger.h"
-#include "ConsoleBackend.h"
-#include "FileBackend.h"
+
+#include <cstdio>
 #include <fstream>
 #include <sstream>
-#include <cstdio>
+
+#include "ConsoleBackend.h"
+#include "FileBackend.h"
+#include "logger.h"
 
 // Helper: read file content
-std::string readFile(const std::string& path) 
+std::string readFile(const std::string &path)
 {
-    std::ifstream in(path);
-    std::ostringstream ss;
-    ss << in.rdbuf();
-    return ss.str();
+  std::ifstream in(path);
+  std::ostringstream ss;
+  ss << in.rdbuf();
+  return ss.str();
 }
 
 // Test case 1: Logger with ConsoleBackend
-TEST(LoggerTest, LogToConsole) 
+TEST(LoggerTest, LogToConsole)
 {
-    Logger logger;
-    logger.set_level(logLevel::LOG_LEVEL_DEBUG);
+  Logger logger;
+  logger.set_level(logLevel::LOG_LEVEL_DEBUG);
 
-    // Tạo backend console
-    auto consoleBackend = std::make_shared<ConsoleBackend>();
-    logger.add_backend(consoleBackend);
+  // Tạo backend console
+  auto consoleBackend = std::make_shared<ConsoleBackend>();
+  logger.add_backend(consoleBackend);
 
-    EXPECT_NO_THROW(logger.log(logLevel::LOG_LEVEL_INFO, "Hello Console"));
+  EXPECT_NO_THROW(logger.log(logLevel::LOG_LEVEL_INFO, "Hello Console"));
 }
 
 // Test case 2: Logger with FileBackend
-TEST(LoggerTest, LogToFile) 
+TEST(LoggerTest, LogToFile)
 {
-    std::string path = "test_output.log";
+  std::string path = "test_output.log";
 
-    Logger logger;
-    logger.set_level(logLevel::LOG_LEVEL_DEBUG);
+  Logger logger;
+  logger.set_level(logLevel::LOG_LEVEL_DEBUG);
 
-    auto fileBackend = std::make_shared<FileBackend>(path);
-    logger.add_backend(fileBackend);
+  auto fileBackend = std::make_shared<FileBackend>(path);
+  logger.add_backend(fileBackend);
 
-    logger.log(logLevel::LOG_LEVEL_INFO, "File Test 123");
+  logger.log(logLevel::LOG_LEVEL_INFO, "File Test 123");
 
-    std::string content = readFile(path);
-    EXPECT_NE(content.find("File Test 123"), std::string::npos);
+  std::string content = readFile(path);
+  EXPECT_NE(content.find("File Test 123"), std::string::npos);
 
-    // cleanup
-    std::remove(path.c_str());
+  // cleanup
+  std::remove(path.c_str());
 }
 
 // Test case 3: Log Level Filtering (UC04)
-TEST(LoggerTest, LogLevelFilter) 
+TEST(LoggerTest, LogLevelFilter)
 {
-    std::string path = "filter_test.log";
+  std::string path = "filter_test.log";
 
-    Logger logger;
-    logger.set_level(logLevel::LOG_LEVEL_WARN); // threshold WARNING
+  Logger logger;
+  logger.set_level(logLevel::LOG_LEVEL_WARN); // threshold WARNING
 
-    auto fileBackend = std::make_shared<FileBackend>(path);
-    logger.add_backend(fileBackend);
+  auto fileBackend = std::make_shared<FileBackend>(path);
+  logger.add_backend(fileBackend);
 
-    logger.log(logLevel::LOG_LEVEL_INFO, "This is INFO (should be ignored)");
-    logger.log(logLevel::LOG_LEVEL_ERROR, "This is ERROR (should appear)");
+  logger.log(logLevel::LOG_LEVEL_INFO, "This is INFO (should be ignored)");
+  logger.log(logLevel::LOG_LEVEL_ERROR, "This is ERROR (should appear)");
 
-    std::string content = readFile(path);
-    EXPECT_EQ(content.find("INFO"), std::string::npos);
-    EXPECT_NE(content.find("ERROR"), std::string::npos);
+  std::string content = readFile(path);
+  EXPECT_EQ(content.find("INFO"), std::string::npos);
+  EXPECT_NE(content.find("ERROR"), std::string::npos);
 
-    // cleanup
-    std::remove(path.c_str());
+  // cleanup
+  std::remove(path.c_str());
 }

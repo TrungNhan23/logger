@@ -1,8 +1,9 @@
 #include "ConsoleBackend.h"
-#include <string>
-#include <iostream>
 
-void ConsoleBackend::write(const std::string& formattedMsg)
+#include <iostream>
+#include <string>
+
+void ConsoleBackend::write(const std::string &formattedMsg)
 {
-    std::cout << formattedMsg << std::endl; 
+  std::cout << formattedMsg << std::endl;
 }

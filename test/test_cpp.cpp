@@ -1,21 +1,21 @@
-#include "logger.h"
 #include "ConsoleBackend.h"
 #include "FileBackend.h"
+#include "logger.h"
 
-int main() 
+int main()
 {
-    Logger logger;
+  Logger logger;
 
-    // add console backend
-    logger.add_backend(std::make_shared<ConsoleBackend>());
+  // add console backend
+  logger.add_backend(std::make_shared<ConsoleBackend>());
 
-    // add file backend
-    logger.add_backend(std::make_shared<FileBackend>("log.txt"));
+  // add file backend
+  logger.add_backend(std::make_shared<FileBackend>("log.txt"));
 
-    // test log
-    logger.log(logLevel::LOG_LEVEL_INFO, "System started");
-    logger.log(logLevel::LOG_LEVEL_WARN, "Low battery");
-    logger.log(logLevel::LOG_LEVEL_ERROR, "System failure!");
+  // test log
+  logger.log(logLevel::LOG_LEVEL_INFO, "System started");
+  logger.log(logLevel::LOG_LEVEL_WARN, "Low battery");
+  logger.log(logLevel::LOG_LEVEL_ERROR, "System failure!");
 
-    return 0;
+  return 0;
 }
