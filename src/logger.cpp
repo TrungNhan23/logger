@@ -1,29 +1,28 @@
-#include <logger.h>
 #include <LogFormatter.h>
-#include "ILogBackend.h"
-#include <string>
+#include <logger.h>
+
 #include <memory>
+#include <string>
 
-void Logger::set_level(logLevel level)
-{
-    this->LogLevel = level;
-}
+#include "ILogBackend.h"
 
-void Logger::log(logLevel level, const std::string& message)
+void Logger::set_level(logLevel level) { this->LogLevel = level; }
+
+void Logger::log(logLevel level, const std::string &message)
 {
-    if (level > LogLevel) 
+  if(level > LogLevel)
     {
-        return;
+      return;
     }
 
-    auto formatted = LogFormatter::format(level, message);
-    for (auto& backend : backends) 
+  auto formatted = LogFormatter::format(level, message);
+  for(auto &backend : backends)
     {
-        backend->write(formatted);
+      backend->write(formatted);
     }
 }
 
 void Logger::add_backend(std::shared_ptr<ILogBackend> backend)
 {
-    backends.push_back(backend);
+  backends.push_back(backend);
 }

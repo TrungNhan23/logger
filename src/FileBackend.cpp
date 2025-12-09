@@ -1,20 +1,18 @@
 #include "FileBackend.h"
-#include <string>
+
 #include <fstream>
-#include <ios> 
-#include <ostream> 
+#include <ios>
+#include <ostream>
+#include <string>
 
-
-FileBackend::FileBackend(const std::string& filename)
+FileBackend::FileBackend(const std::string &filename)
     : file(filename, std::ios::app)
 {}
 
-
-void FileBackend::write(const std::string& formattedMsg)
+void FileBackend::write(const std::string &formattedMsg)
 {
-    if (file.is_open()) 
+  if(file.is_open())
     {
-        file << formattedMsg << std::endl;
+      file << formattedMsg << std::endl;
     }
-
 }
