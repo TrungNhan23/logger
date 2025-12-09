@@ -7,7 +7,6 @@
 
 // #include "logger.h"
 
-
 // extern void mcu_uart_putchar(char c);
 
 // void logger_platform_output(const char *str) {
