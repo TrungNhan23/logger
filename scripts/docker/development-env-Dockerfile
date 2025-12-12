@@ -33,7 +33,6 @@ RUN apt-get update && \
 
 # --- Install act (GitHub Actions local runner) ---
 RUN set -eux; \
-    unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY; \
     ACT_VERSION="v0.2.60"; \
     ARCH=$(uname -m); \
     case "$ARCH" in \
@@ -58,5 +57,5 @@ RUN cd /usr/src/googletest && \
 RUN useradd -ms /bin/bash runner && \
     echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-USER runner
-WORKDIR /home/runner
+USER ${USER:-}
+WORKDIR /home/${USER:-}
