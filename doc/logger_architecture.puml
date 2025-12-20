@@ -1,0 +1,64 @@
+@startuml
+skinparam shadowing false
+skinparam linetype ortho
+
+title Cross-Platform Logger Architecture
+
+package "Application Layer" {
+    rectangle "Application\n(Firmware / Services)" as APP
+}
+
+package "Logger Frontend (API)" {
+    rectangle "Logger API\n(Macros / Functions)" as API
+}
+
+package "Policy Layer (Compile-Time)" {
+    rectangle "Level Policy" as LP
+    rectangle "Format Policy" as FP
+    rectangle "Dispatch Policy" as DP
+    rectangle "Concurrency Policy" as CP
+    rectangle "Failure Policy" as FAP
+}
+
+package "Core Logging Engine" {
+    rectangle "Record Creation" as RC
+    rectangle "Policy Application" as PA
+    rectangle "Record Dispatch" as RD
+}
+
+package "Sink / Transport Layer" {
+    rectangle "UART Sink" as UART
+    rectangle "RTT Sink" as RTT
+    rectangle "File Sink" as FILE
+    rectangle "Syslog Sink" as SYS
+    rectangle "Ring Buffer Sink" as RB
+}
+
+package "Platform Abstraction Layer (PAL)" {
+    rectangle "Time Source" as TIME
+    rectangle "Locking" as LOCK
+    rectangle "Low-level IO" as IO
+    rectangle "OS / HW Services" as OS
+}
+
+APP --> API
+API --> LP
+LP --> RC
+RC --> PA
+PA --> RD
+
+RD --> UART
+RD --> RTT
+RD --> FILE
+RD --> SYS
+RD --> RB
+
+UART --> IO
+RTT --> IO
+FILE --> OS
+SYS --> OS
+RB --> LOCK
+
+TIME ..> RC
+
+@enduml

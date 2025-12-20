@@ -1,0 +1,61 @@
+FROM ubuntu:22.04
+
+# --- Proxy optional ---
+ENV HTTP_PROXY=${HTTP_PROXY:-}
+ENV HTTPS_PROXY=${HTTPS_PROXY:-}
+ENV NO_PROXY=${NO_PROXY:-}
+ENV http_proxy=${HTTP_PROXY:-}
+ENV https_proxy=${HTTPS_PROXY:-}
+ENV no_proxy=${NO_PROXY:-}
+
+RUN echo "Using proxy: $HTTP_PROXY"
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        sudo \
+        wget \
+        build-essential \
+        cmake \
+        clang \
+        clang-tidy \
+        clang-format \
+        python3 \
+        git \
+        libgtest-dev \
+        curl \
+        tar && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && \
+    apt-get install -y ca-certificates && \
+    update-ca-certificates
+
+# --- Install act (GitHub Actions local runner) ---
+RUN set -eux; \
+    ACT_VERSION="v0.2.60"; \
+    ARCH=$(uname -m); \
+    case "$ARCH" in \
+        x86_64) ACT_ARCH="x86_64" ;; \
+        aarch64|arm64) ACT_ARCH="arm64" ;; \
+        *) echo "Unsupported arch: $ARCH"; exit 1 ;; \
+    esac; \
+    echo "Detected architecture: $ACT_ARCH"; \
+    wget https://github.com/nektos/act/releases/download/${ACT_VERSION}/act_Linux_${ACT_ARCH}.tar.gz -O /tmp/act.tar.gz; \
+    if [ ! -s /tmp/act.tar.gz ]; then echo "ERROR: act binary failed to download"; exit 1; fi; \
+    tar -xzf /tmp/act.tar.gz -C /tmp; \
+    mv /tmp/act /usr/local/bin/act; \
+    chmod +x /usr/local/bin/act; \
+    rm /tmp/act.tar.gz
+
+# Build and install GoogleTest
+RUN cd /usr/src/googletest && \
+    cmake . && make && \
+    cp lib/*.a /usr/local/lib
+
+# Add non-root user
+RUN useradd -ms /bin/bash runner && \
+    echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+USER ${USER:-}
+WORKDIR /home/${USER:-}
