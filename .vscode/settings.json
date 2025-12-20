@@ -1,0 +1,6 @@
+{
+  "plantuml.render": "PlantUMLServer",
+  "plantuml.server": "http://localhost:8080",
+  "plantuml.exportFormat": "png",
+  "plantuml.previewAutoUpdate": true
+}
