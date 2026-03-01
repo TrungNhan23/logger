@@ -27,11 +27,15 @@ CheckOptions:
   - key:             readability-magic-numbers.IgnorePowersOfTwo
     value:           '1'
   - key:             readability-identifier-naming.VariableCase
-    value:           lower_case
+    value:           snake_case
+  - key:             readability-identifier-naming.PrivateMemberPrefix
+    value:           'm_'
   - key:             readability-identifier-naming.FunctionCase
-    value:           lower_case
+    value:           camelCase
   - key:             readability-identifier-naming.ClassCase
     value:           CamelCase
+  - key:             readability-identifier-naming.EnumCase
+    value:           camelCase
   - key:             readability-identifier-naming.ConstantCase
     value:           UPPER_CASE
 

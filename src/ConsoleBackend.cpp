@@ -1,7 +1,7 @@
-#include "ConsoleBackend.h"
-
 #include <iostream>
 #include <string>
+
+#include "ConsoleBackend.h"
 
 void ConsoleBackend::write(const std::string &formattedMsg)
 {

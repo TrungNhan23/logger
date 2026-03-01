@@ -1,13 +1,14 @@
-#include "FileBackend.h"
-
 #include <fstream>
 #include <ios>
 #include <ostream>
 #include <string>
 
+#include "FileBackend.h"
+
 FileBackend::FileBackend(const std::string &filename)
     : file(filename, std::ios::app)
-{}
+{ 
+}
 
 void FileBackend::write(const std::string &formattedMsg)
 {

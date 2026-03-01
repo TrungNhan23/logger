@@ -68,7 +68,7 @@ endif()
 add_library(logger_lib
     src/logger_core.c
     src/logger_linux.c
-    src/logger.cpp
+    src/Logger.cpp
     src/FileBackend.cpp
     src/ConsoleBackend.cpp
     src/LogFormatter.cpp
