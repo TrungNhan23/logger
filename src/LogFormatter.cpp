@@ -1,4 +1,5 @@
 #include "LogFormatter.hpp"
+
 #include <chrono>
 #include <ctime>
 #include <sstream>
@@ -8,7 +9,7 @@ namespace Helper
 namespace Logger
 {
 
-const size_t SIZE_OF_BUFFER = 9; // HH:MM:SS + null terminator
+const size_t SIZE_OF_TIMESTAMP = 9; // HH:MM:SS + null terminator
 
 LogFormatter& LogFormatter::getInstance()
 {
@@ -16,26 +17,47 @@ LogFormatter& LogFormatter::getInstance()
     return instance;
 }
 
-std::string LogFormatter::format(logLevel& level,
-                                 const std::string& file,
-                                 int line,
-                                 const std::string& message)
-{
-    std::ostringstream oss;
+// std::string LogFormatter::format(logLevel& level,
+//                                  const std::string& file,
+//                                  int line,
+//                                  const std::string& message,
+//                                  ... /*args*/)
+// {
+//     std::ostringstream oss;
 
-    oss << file << ":" << line << " ";
+//     oss << file << ":" << line << " ";
 
-    if (level == logLevel::LOG_DEBUG ||
-        level == logLevel::LOG_ERROR)
-    {
-        oss << getCurrentTime() << " ";
-    }
+//     if (level == logLevel::LOG_DEBUG ||
+//         level == logLevel::LOG_ERROR)
+//     {
+//         oss << getCurrentTime() << " ";
+//     }
 
-    oss << "[" << levelToString(level) << "] "
-        << message;
+//     oss << "[" << levelToString(level) << "] ";
 
-    return oss.str();
-}
+//     va_list args;
+//     va_start(args, message);
+
+//     va_list args_copy;
+//     va_copy(args_copy, args);
+
+//     int size = vsnprintf(nullptr, 0, message.c_str(), args_copy);
+//     va_end(args_copy);
+
+//     if (size < 0)
+//     {
+//         va_end(args);
+//         return oss.str() + message; // Return unformatted message on error
+//     }
+
+//     std::vector<char> buf(size + 1);
+//     std::vsnprintf(buf.data(), buf.size(), message.c_str(), args);
+
+//     va_end(args);
+//     oss << buf.data();
+    
+//     return oss.str();
+// }
 
 std::string LogFormatter::getCurrentTime() const
 {
@@ -50,7 +72,7 @@ std::string LogFormatter::getCurrentTime() const
     localtime_r(&time_now, &local_tm);
 #endif
 
-    std::array<char, SIZE_OF_BUFFER> buffer{}; // HH:MM:SS
+    std::array<char, SIZE_OF_TIMESTAMP> buffer{}; // HH:MM:SS
 
     const std::size_t written =
         std::strftime(buffer.data(),

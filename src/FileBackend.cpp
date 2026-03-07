@@ -5,15 +5,23 @@
 
 #include "FileBackend.h"
 
-FileBackend::FileBackend(const std::string &filename)
-    : file(filename, std::ios::app)
-{ 
+namespace Helper
+{
+namespace Logger
+{
+
+FileBackend::FileBackend(const std::string &fileName)
+    : m_fileName(fileName, std::ios::app)
+{
 }
 
-void FileBackend::write(const std::string &formattedMsg)
+void FileBackend::write(const std::string &formattedMessage)
 {
-  if(file.is_open())
+  if(m_fileName.is_open())
     {
-      file << formattedMsg << std::endl;
+      m_fileName << formattedMessage  << std::endl;
     }
 }
+
+} // namespace Logger
+} // namespace Helper

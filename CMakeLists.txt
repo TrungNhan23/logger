@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.16)
 project(LoggerProject C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+find_package(fmt REQUIRED)
 
 # =========================================================
 # Include paths
@@ -72,6 +73,12 @@ add_library(logger_lib
     src/FileBackend.cpp
     src/ConsoleBackend.cpp
     src/LogFormatter.cpp
+)
+
+target_link_libraries(
+    logger_lib
+    PRIVATE
+    fmt::fmt
 )
 
 target_include_directories(logger_lib PUBLIC

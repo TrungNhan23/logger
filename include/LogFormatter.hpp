@@ -2,7 +2,13 @@
 
 #include <string>
 #include <array>
-
+// #include <cstdarg>
+// #include <cstdio>
+#include <fmt/format.h>
+#include <vector>
+#include <chrono>
+#include <ctime>
+#include <sstream>
 
 #include "LogLevel.hpp"
 
@@ -10,6 +16,8 @@ namespace Helper
 {
 namespace Logger
 {
+
+constexpr size_t SIZE_OF_BUFFER = 1024; // Buffer size for formatted messages
 
 /**
  * @struct LogFormat
@@ -105,10 +113,35 @@ public:
      *
      * @return Fully formatted log string.
      */
-    std::string format(logLevel& level,
+    template<typename... Args>
+    std::string format(logLevel level,
                        const std::string& file,
                        int line,
-                       const std::string& message);
+                       const std::string& message,
+                       Args&&... args)
+    {
+        // std::string msg = fmt::format(message, std::forward<Args>(args)...);
+        std::ostringstream oss;
+
+        oss << file << ":" << line << " ";
+
+        if (level == logLevel::LOG_DEBUG ||
+            level == logLevel::LOG_ERROR)
+        {
+            oss << getCurrentTime() << " ";
+        }
+
+        oss << "[" << levelToString(level) << "] "
+            << ([](auto&&... args)
+                {
+                    std::ostringstream oss;
+                    (oss << ... << std::forward<decltype(args)>(args));
+                    return oss.str();
+
+                }(message, std::forward<Args>(args)...));
+
+        return oss.str();
+    }
 
     /**
      * @brief Deleted copy constructor.

@@ -67,7 +67,7 @@ public:
       // }
 
       // Format the message using LogFormatter
-      auto formattedMessage = LogFormatter::getInstance().format(level, file, line, message);
+      auto formattedMessage = LogFormatter::getInstance().format(level, file, line, message, std::forward<Args>(args)...);
 
       std::lock_guard<std::mutex> lock(m_logMutex);
       for (const auto& backend : m_logBackends)

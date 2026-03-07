@@ -3,9 +3,8 @@
 
 int main()
 {
-
-  auto consoleBackend = std::make_shared<ConsoleBackend>(); 
-  Helper::Logger::Logger::getInstance().addBackend(consoleBackend);
+  Helper::Logger::Logger::getInstance().
+                          addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
 
 
   LOG_DEBUG("This is a debug message");
@@ -15,10 +14,9 @@ int main()
 
   for (auto i = 0; i < 10; ++i)
   {
-    LOG_DEBUG("Debug message %d", i); // wring behavior: should not right value
-                                      // but should write "Debug message %d"
-    LOG_INFO("Info message %d", i);
-    LOG_WARN("Warning message %d", i);
-    LOG_ERROR("Error message %d", i);
+    LOG_DEBUG("Debug message ", i, " times", " with more details");
+    LOG_INFO("Info message ", i, " times", " with more details");
+    LOG_WARN("Warning message ", i, " times", " with more details");
+    LOG_ERROR("Error message ", i, " times", " with more details");
   }
 }
