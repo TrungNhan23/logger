@@ -1,4 +1,4 @@
-name: Build Logger Library for Cross-platform make by Nhen
+name: Logger Library building by Nhen
 
 on:
   push:
@@ -10,8 +10,9 @@ on:
     branches:
       - master
 
-  schedule:
-    - cron: '0 2,8 * * *'
+  # Only enable build when we want to check this build stable or not
+  # schedule:
+  #   - cron: '0 2,8 * * *'
 
 jobs:
   build:
@@ -27,6 +28,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y ccache clang-tidy clang-format lcov
+    
+    # --- Setup Docker environment ---
+    - name: Prepare docker environment
+      run: ./scripts/docker_prepare.sh
+    
+    - name: Starting docker container
+      run: ./scripts/run_dev.sh
 
     # --- Configure CMake with coverage enabled ---
     - name: Configure CMake
