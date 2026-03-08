@@ -9,7 +9,7 @@ on:
   pull_request:
     branches:
       - master
-
+  workflow_dispatch:
   # Only enable build when we want to check this build stable or not
   # schedule:
   #   - cron: '0 2,8 * * *'
