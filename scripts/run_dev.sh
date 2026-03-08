@@ -20,8 +20,7 @@ fi
 if [ "$1" = "CI=ON" ]; then
   docker run -d \
     --name ${CONTAINER_NAME} \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v ${REPO_ROOT_DIR}:/workspace \
+    -v ${GITHUB_WORKSPACE}:/workspace \
     -w /workspace \
     ${IMAGE_NAME} \
     sleep infinity
