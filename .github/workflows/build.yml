@@ -77,4 +77,4 @@ jobs:
     #     path: coverage_report/
     - name: Cleaning build artifacts
       if: always()
-      run: rm -rf build
+      run: ./scripts/run_dev.sh rm -rf build
