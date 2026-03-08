@@ -17,7 +17,7 @@ echo_green ()
 
 ensure_in_docker()
 {
-    if grep -qE '(docker|containerd|kubepods)' /proc/1/cgroup 2>/dev/null; then
+    if [ -f /.dockerenv ] || grep -qE '(docker|containerd|kubepods)' /proc/1/cgroup 2>/dev/null; then
         echo_green "Running inside a Docker container."
     else
         echo_red "Not running inside a Docker container."
