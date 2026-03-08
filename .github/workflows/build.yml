@@ -39,18 +39,17 @@ jobs:
 
     # --- Configure CMake with coverage enabled ---
     - name: Configure CMake
-      run: docker exec dev_container ./scripts/build_native.sh configure
+      run: docker exec development-env ./scripts/build_native.sh configure
 
     - name: Check linter
-      run: docker exec dev_container ./scripts/build_native.sh lint
+      run: docker exec development-env ./scripts/build_native.sh lint
 
     - name: Build project
-      run: docker exec dev_container ./scripts/build_native.sh build
+      run: docker exec development-env ./scripts/build_native.sh build
 
     # --- Run all test binaries in build/test ---
     - name: Run all tests
-      run: docker exec dev_container ./scripts/build_native.sh run
-
+      run: docker exec development-env ./scripts/build_native.sh run
     # --- Collect Coverage ---
     # - name: Capture Coverage
     #   run: |
