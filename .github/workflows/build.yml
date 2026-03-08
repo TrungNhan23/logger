@@ -33,42 +33,43 @@ jobs:
     - name: Prepare docker environment
       run: ./scripts/docker_prepare.sh
     
-    - name: Starting docker container
-      run: ./scripts/run_dev.sh
+    # - name: Starting docker container
+    #   run: ./scripts/run_dev.sh # this step will not start, need to find out other solution 
+                                # to run the docker container and execute the build steps inside it.
 
     # --- Configure CMake with coverage enabled ---
     - name: Configure CMake
-      run: ./scripts/build_native.sh configure
+      run: docker exec dev_container ./scripts/build_native.sh configure
 
     - name: Check linter
-      run: ./scripts/build_native.sh lint
+      run: docker exec dev_container ./scripts/build_native.sh lint
 
     - name: Build project
-      run: ./scripts/build_native.sh build
+      run: docker exec dev_container ./scripts/build_native.sh build
 
     # --- Run all test binaries in build/test ---
     - name: Run all tests
-      run: ./scripts/build_native.sh run
+      run: docker exec dev_container ./scripts/build_native.sh run
 
     # --- Collect Coverage ---
-    - name: Capture Coverage
-      run: |
-        lcov --capture --directory build --output-file coverage.info
+    # - name: Capture Coverage
+    #   run: |
+    #     lcov --capture --directory build --output-file coverage.info
 
-        # Remove unwanted coverage paths
-        lcov --remove coverage.info \
-            '/usr/*' \
-            '*/third-party/googletest/*' \
-            '*/build/test/*' \
-            --output-file coverage.info
+    #     # Remove unwanted coverage paths
+    #     lcov --remove coverage.info \
+    #         '/usr/*' \
+    #         '*/third-party/googletest/*' \
+    #         '*/build/test/*' \
+    #         --output-file coverage.info
 
-        # Show coverage summary in logs
-        lcov --list coverage.info
+    #     # Show coverage summary in logs
+    #     lcov --list coverage.info
 
-    # --- Generate HTML report ---
-    - name: Generate Coverage Report
-      run: |
-        genhtml coverage.info --output-directory coverage_report
+    # # --- Generate HTML report ---
+    # - name: Generate Coverage Report
+    #   run: |
+    #     genhtml coverage.info --output-directory coverage_report
 
     # --- Upload as GitHub artifact ---
     # - name: Upload Coverage Report
