@@ -1,18 +1,27 @@
-#include "FileBackend.h"
-
 #include <fstream>
 #include <ios>
 #include <ostream>
 #include <string>
 
-FileBackend::FileBackend(const std::string &filename)
-    : file(filename, std::ios::app)
-{}
+#include "FileBackend.h"
 
-void FileBackend::write(const std::string &formattedMsg)
+namespace Helper
 {
-  if(file.is_open())
+namespace Logger
+{
+
+FileBackend::FileBackend(const std::string &fileName)
+    : m_fileName(fileName, std::ios::app)
+{
+}
+
+void FileBackend::write(const std::string &formattedMessage)
+{
+  if(m_fileName.is_open())
     {
-      file << formattedMsg << std::endl;
+      m_fileName << formattedMessage  << std::endl;
     }
 }
+
+} // namespace Logger
+} // namespace Helper

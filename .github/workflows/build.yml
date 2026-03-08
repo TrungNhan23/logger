@@ -1,16 +1,18 @@
-name: Build Logger Library for Cross-platform make by Nhen
+name: Logger Library building by Nhen
 
 on:
   push:
     branches:
       - 'feature/*'
-      - 'bugfix/*'
-      - 'hotfix/*'
+      - 'fixbug/*'
+
   pull_request:
     branches:
       - master
-  schedule:
-    - cron: '0 2,8 * * *'
+
+  # Only enable build when we want to check this build stable or not
+  # schedule:
+  #   - cron: '0 2,8 * * *'
 
 jobs:
   build:
@@ -24,51 +26,48 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt-get update -y
-        sudo apt-get install -y build-essential cmake lcov clang-tidy clang-format
+        sudo apt-get update
+        sudo apt-get install -y ccache clang-tidy clang-format lcov
+    
+    # --- Setup Docker environment ---
+    - name: Prepare docker environment
+      run: ./scripts/docker_prepare.sh
+    
+    - name: Starting docker container
+      run: ./scripts/run_dev.sh CI=ON
 
     # --- Configure CMake with coverage enabled ---
     - name: Configure CMake
-      run: |
-        cmake -S . -B build \
-              -DENABLE_LINT=ON \
-              -DENABLE_COVERAGE=ON \
-              -DCMAKE_BUILD_TYPE=Debug \
-              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      run: ./scripts/run_dev.sh ./scripts/build_native.sh configure
 
     - name: Check linter
-      run: cmake --build build --target lint
+      run: ./scripts/run_dev.sh ./scripts/build_native.sh lint
 
     - name: Build project
-      run: cmake --build build -- -j$(nproc)
+      run: ./scripts/run_dev.sh ./scripts/build_native.sh build
 
     # --- Run all test binaries in build/test ---
     - name: Run all tests
-      run: |
-        find build/test -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' testfile; do
-          echo "Running $testfile"
-          "$testfile"
-        done
-
+      run: ./scripts/run_dev.sh ./scripts/build_native.sh run
     # --- Collect Coverage ---
-    - name: Capture Coverage
-      run: |
-        lcov --capture --directory build --output-file coverage.info
+    # - name: Capture Coverage
+    #   run: |
+    #     lcov --capture --directory build --output-file coverage.info
 
-        # Remove unwanted coverage paths
-        lcov --remove coverage.info \
-            '/usr/*' \
-            '*/third-party/googletest/*' \
-            '*/build/test/*' \
-            --output-file coverage.info
+    #     # Remove unwanted coverage paths
+    #     lcov --remove coverage.info \
+    #         '/usr/*' \
+    #         '*/third-party/googletest/*' \
+    #         '*/build/test/*' \
+    #         --output-file coverage.info
 
-        # Show coverage summary in logs
-        lcov --list coverage.info
+    #     # Show coverage summary in logs
+    #     lcov --list coverage.info
 
-    # --- Generate HTML report ---
-    - name: Generate Coverage Report
-      run: |
-        genhtml coverage.info --output-directory coverage_report
+    # # --- Generate HTML report ---
+    # - name: Generate Coverage Report
+    #   run: |
+    #     genhtml coverage.info --output-directory coverage_report
 
     # --- Upload as GitHub artifact ---
     # - name: Upload Coverage Report
@@ -76,3 +75,6 @@ jobs:
     #   with:
     #     name: coverage-report
     #     path: coverage_report/
+    - name: Cleaning build artifacts
+      if: always()
+      run: ./scripts/run_dev.sh rm -rf build

@@ -1,0 +1,25 @@
+@startuml
+skinparam shadowing false
+skinparam linetype ortho
+title Core Processing – Big Picture
+
+package "CoreProcessing" {
+
+    rectangle "EventModel\n(Defines Log Event Structure)" as EVENT_MODEL
+    rectangle "EventLifecycle\n(Create / Validate / Finalize)" as EVENT_LIFECYCLE
+    rectangle "PolicyEngine\n(Evaluate Rules)" as POLICY_ENGINE
+    rectangle "DispatchEngine\n(Compute Routing Decisions)" as DISPATCH_ENGINE
+    rectangle "FailureHandling\n(Dropped / Rejected Events)" as FAILURE_HANDLING
+    rectangle "CoreState\n(Internal Metrics & State)" as CORE_STATE
+}
+
+EVENT_LIFECYCLE --> EVENT_MODEL : uses
+EVENT_LIFECYCLE --> POLICY_ENGINE : forwards finalized event
+POLICY_ENGINE --> DISPATCH_ENGINE : passes evaluation result
+DISPATCH_ENGINE --> FAILURE_HANDLING : on drop/reject
+
+CORE_STATE ..> EVENT_LIFECYCLE
+CORE_STATE ..> POLICY_ENGINE
+CORE_STATE ..> DISPATCH_ENGINE
+
+@enduml

@@ -1,23 +1,22 @@
+#include "Log.hpp"
 #include "ConsoleBackend.h"
-#include "FileBackend.h"
-#include "logger.h"
-
-static logLevel currentLevel = logLevel::LOG_LEVEL_DEBUG;
 
 int main()
 {
-  Logger logger;
+  Helper::Logger::Logger::getInstance().
+                          addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
 
-  // add console backend
-  logger.add_backend(std::make_shared<ConsoleBackend>());
 
-  // add file backend
-  logger.add_backend(std::make_shared<FileBackend>("test_log_category.txt"));
+  LOG_DEBUG("This is a debug message");
+  LOG_INFO("This is an info message");
+  LOG_WARN("This is a warning message");
+  LOG_ERROR("This is an error message");
 
-  // test log
-  logger.log(logLevel::LOG_LEVEL_INFO, "This is INFO");
-  logger.log(logLevel::LOG_LEVEL_WARN, "This is WARN");
-  logger.log(logLevel::LOG_LEVEL_ERROR, "This is ERROR");
-  logger.log(logLevel::LOG_LEVEL_DEBUG, "This is DEBUG");
-  return 0;
+  for (auto i = 0; i < 10; ++i)
+  {
+    LOG_DEBUG("Debug message ", i, " times", " with more details");
+    LOG_INFO("Info message ", i, " times", " with more details");
+    LOG_WARN("Warning message ", i, " times", " with more details");
+    LOG_ERROR("Error message ", i, " times", " with more details");
+  }
 }

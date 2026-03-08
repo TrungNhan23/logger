@@ -1,0 +1,30 @@
+@startuml
+skinparam shadowing false
+skinparam linetype ortho
+title Core Processing – Data Flow Sequence
+
+actor "API Interface" as API
+
+participant "EventLifeCycle" as LIFECYCLE
+participant "PolicyEngine" as POLICY
+participant "DispatchEngine" as DISPATCH
+participant "FailureHandling" as FAILURE
+participant "CoreState" as STATE
+
+API -> LIFECYCLE : createEvent()
+LIFECYCLE -> LIFECYCLE : validateEvent()
+LIFECYCLE -> STATE : update validation metrics
+LIFECYCLE -> LIFECYCLE : finalizeEvent()
+
+LIFECYCLE -> POLICY : evaluatePolicies(event)
+POLICY -> STATE : read/write policy-related counters
+
+alt "Policies Accept Event"
+    POLICY -> DISPATCH : planDispatch(event)
+    DISPATCH -> STATE : update routing metrics
+else "Policies Reject Event"
+    POLICY -> FAILURE : handleRejectedEvent(event)
+    FAILURE -> STATE : increment drop counters
+end
+
+@enduml
