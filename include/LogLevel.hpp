@@ -1,5 +1,7 @@
 #pragma once
 
+#include <enum.h>
+
 namespace Helper {
 namespace Logger {
 
@@ -7,14 +9,7 @@ namespace Logger {
  * @enum LogLevel
  * @brief Defines severity levels for logging.
  */
-enum class logLevel
-{
-  LOG_NONE = 0,
-  LOG_INFO,
-  LOG_ERROR,
-  LOG_WARN,
-  LOG_DEBUG,
-};
+BETTER_ENUM(logLevel, int, NONE = 0, INFO, ERROR, WARNING, DEBUG)
 
 } // namespace Logger
 } // namespace Helper

@@ -75,16 +75,23 @@ add_library(logger_lib
     src/LogFormatter.cpp
 )
 
+add_library(better_enums INTERFACE)
+
 target_link_libraries(
     logger_lib
-    PRIVATE
+    PUBLIC
     fmt::fmt
+    better_enums
 )
 
 target_include_directories(logger_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     ${CMAKE_SOURCE_DIR}/config
     ${CMAKE_SOURCE_DIR}/platform
+)
+
+target_include_directories(better_enums INTERFACE
+    ${CMAKE_SOURCE_DIR}/third-party/better-enums
 )
 
 target_compile_definitions(logger_lib PUBLIC PLATFORM_LINUX)

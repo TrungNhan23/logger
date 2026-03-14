@@ -54,7 +54,7 @@ run()
 
 parse_options()
 {
-    case "${1:-all}" in
+    case "${1:-build_and_run}" in
         configure)
             configure
             ;;
@@ -68,6 +68,7 @@ parse_options()
             run
             ;;
         build_and_run)
+            configure
             build
             run
             ;;    

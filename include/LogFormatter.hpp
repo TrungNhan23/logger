@@ -125,13 +125,13 @@ public:
 
         oss << file << ":" << line << " ";
 
-        if (level == logLevel::LOG_DEBUG ||
-            level == logLevel::LOG_ERROR)
+        if (level._to_integral() == logLevel::DEBUG ||
+            level._to_integral() == logLevel::ERROR)
         {
             oss << getCurrentTime() << " ";
         }
 
-        oss << "[" << levelToString(level) << "] "
+        oss << "[" << level._to_string() << "] "
             << ([](auto&&... args)
                 {
                     std::ostringstream oss;
@@ -177,14 +177,6 @@ private:
      * @return Current time as string.
      */
     std::string getCurrentTime() const;
-
-    /**
-     * @brief Converts a log level to its string representation.
-     *
-     * @param level Log severity level.
-     * @return C-string representation of the level.
-     */
-    const char* levelToString(logLevel& level) const;
 };
 
 } // namespace Logger

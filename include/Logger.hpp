@@ -91,7 +91,7 @@ private:
   /**
    * @brief The current log level threshold.
    */
-  logLevel m_level{logLevel::LOG_INFO};
+  logLevel m_level{logLevel::INFO};
 
   /**
     * @brief Mutex to ensure thread-safe logging.
