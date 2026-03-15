@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-BUILD_DIR="$SCRIPT_DIR/../build"
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+BUILD_DIR="$ROOT_DIR/build"
 OUTPUT_FILE="$BUILD_DIR/coverage.info"
 REPORT_DIR="$BUILD_DIR/coverage_report"
 
