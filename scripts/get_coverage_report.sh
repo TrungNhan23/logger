@@ -6,6 +6,7 @@ BUILD_DIR="$ROOT_DIR/build"
 OUTPUT_FILE="$BUILD_DIR/coverage.info"
 REPORT_DIR="$BUILD_DIR/coverage_report"
 
+chmod -R u+w "$BUILD_DIR"
 echo "=== Capturing coverage ==="
 
 lcov --capture \
