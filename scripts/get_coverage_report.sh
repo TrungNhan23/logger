@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-BUILD_DIR="build"
-OUTPUT_FILE="build/coverage.info"
-REPORT_DIR="build/coverage_report"
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+BUILD_DIR="$SCRIPT_DIR/../build"
+OUTPUT_FILE="$BUILD_DIR/coverage.info"
+REPORT_DIR="$BUILD_DIR/coverage_report"
 
 echo "=== Capturing coverage ==="
 
