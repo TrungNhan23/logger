@@ -5,22 +5,55 @@ set(CMAKE_CXX_STANDARD 17)
 find_package(fmt REQUIRED)
 
 # =========================================================
-# Include paths
-# =========================================================
-include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/config)
-include_directories(${CMAKE_SOURCE_DIR}/platform)
-
-# =========================================================
 # Enable coverage BEFORE creating targets
 # =========================================================
 option(ENABLE_COVERAGE "Enable coverage reporting" ON)
 option(ENABLE_LINT "Enable linting with clang-tidy" ON)
 
+# =========================================================
+# Build logger library
+# =========================================================
+file(GLOB LOGGER_SOURCES CONFIGURE_DEPENDS
+    ${CMAKE_SOURCE_DIR}/src/*.c
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+)
+
+# =========================================================
+# Header-only dependency
+# =========================================================
+add_library(better_enums INTERFACE)
+
+target_include_directories(better_enums INTERFACE
+    ${CMAKE_SOURCE_DIR}/third-party/better-enums
+)
+
+# =========================================================
+# Logger library target
+# =========================================================
+add_library(logger_lib ${LOGGER_SOURCES})
+
+target_link_libraries(
+    logger_lib
+    PUBLIC
+    fmt::fmt
+    better_enums
+)
+
+target_include_directories(logger_lib PUBLIC
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/config
+)
+
+target_include_directories(better_enums INTERFACE
+    ${CMAKE_SOURCE_DIR}/third-party/better-enums
+)
+
+target_compile_definitions(logger_lib PUBLIC PLATFORM_LINUX)
+
 if(ENABLE_COVERAGE)
     message(STATUS "Building with coverage flags")
-    add_compile_options(--coverage -O0 -g)
-    add_link_options(--coverage)
+    target_compile_options(logger_lib PRIVATE -O0 -g --coverage)
+    target_link_options(logger_lib PRIVATE --coverage)
 endif()
 
 # =========================================================
@@ -34,7 +67,7 @@ add_subdirectory(third-party/googletest)
 add_subdirectory(test)
 
 # =========================================================
-# Lint config (unchanged)
+# Lint config
 # =========================================================
 if(ENABLE_LINT)
     find_program(CLANG_TIDY_EXE NAMES clang-tidy)
@@ -62,36 +95,3 @@ if(ENABLE_LINT)
         message(WARNING "clang-tidy not found, 'make lint' will be unavailable")
     endif()
 endif()
-
-# =========================================================
-# Build logger library
-# =========================================================
-add_library(logger_lib
-    src/logger_core.c
-    src/logger_linux.c
-    src/Logger.cpp
-    src/FileBackend.cpp
-    src/ConsoleBackend.cpp
-    src/LogFormatter.cpp
-)
-
-add_library(better_enums INTERFACE)
-
-target_link_libraries(
-    logger_lib
-    PUBLIC
-    fmt::fmt
-    better_enums
-)
-
-target_include_directories(logger_lib PUBLIC
-    ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/config
-    ${CMAKE_SOURCE_DIR}/platform
-)
-
-target_include_directories(better_enums INTERFACE
-    ${CMAKE_SOURCE_DIR}/third-party/better-enums
-)
-
-target_compile_definitions(logger_lib PUBLIC PLATFORM_LINUX)

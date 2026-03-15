@@ -88,15 +88,6 @@ class LogFormatter
 {
 public:
     /**
-     * @brief Returns the singleton instance of LogFormatter.
-     *
-     * Thread-safe since C++11 due to local static initialization.
-     *
-     * @return Reference to the global LogFormatter instance.
-     */
-    static LogFormatter& getInstance();
-
-    /**
      * @brief Formats a log message according to the formatting policy.
      *
      * Format structure:
@@ -114,7 +105,7 @@ public:
      * @return Fully formatted log string.
      */
     template<typename... Args>
-    std::string format(logLevel level,
+    std::string format(LogLevel level,
                        const std::string& file,
                        int line,
                        const std::string& message,
@@ -125,8 +116,8 @@ public:
 
         oss << file << ":" << line << " ";
 
-        if (level._to_integral() == logLevel::DEBUG ||
-            level._to_integral() == logLevel::ERROR)
+        if (level._to_integral() == LogLevel::DEBUG ||
+            level._to_integral() == LogLevel::ERROR)
         {
             oss << getCurrentTime() << " ";
         }
@@ -157,7 +148,6 @@ public:
      */
     LogFormatter& operator=(const LogFormatter&) = delete;
 
-private:
     /**
      * @brief Private constructor to enforce singleton pattern.
      */
