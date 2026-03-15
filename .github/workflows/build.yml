@@ -52,7 +52,7 @@ jobs:
     
     # --- Collect Coverage ---
     - name: Capture Coverage and Generate Report
-      run: ./scripts/get_coverage_report.sh
+      run: ./scripts/run_dev.sh ./scripts/get_coverage_report.sh
 
     # --- Upload as GitHub artifact ---
     # - name: Upload Coverage Report
