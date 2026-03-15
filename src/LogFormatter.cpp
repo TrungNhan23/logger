@@ -11,12 +11,6 @@ namespace Logger
 
 const size_t SIZE_OF_TIMESTAMP = 9; // HH:MM:SS + null terminator
 
-LogFormatter& LogFormatter::getInstance()
-{
-    static LogFormatter instance;
-    return instance;
-}
-
 std::string LogFormatter::getCurrentTime() const
 {
     const auto now = std::chrono::system_clock::now();
@@ -37,11 +31,6 @@ std::string LogFormatter::getCurrentTime() const
                       buffer.size(),
                       "%H:%M:%S",
                       &localTime);
-
-    if (written == 0U)
-    {
-        return {};
-    }
 
     return {buffer.data(), written};
 }

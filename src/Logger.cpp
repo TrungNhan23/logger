@@ -2,7 +2,6 @@
 #include <string>
 
 #include "Logger.hpp"
-#include "ILogBackend.h"
 
 namespace Helper
 {
@@ -15,15 +14,18 @@ Logger& Logger::getInstance()
     return instance;
 }
 
-void Logger::setLevel(logLevel& level)
+void Logger::setCurrentLevel(LogLevel level)
 {
-    std::lock_guard<std::mutex> lock(m_logMutex);
     m_level = level;
+}
+
+LogLevel Logger::getCurrentLevel() const
+{
+    return m_level;
 }
 
 void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
 {
-    std::lock_guard<std::mutex> lock(m_logMutex);
     m_logBackends.push_back(backend);
 }
 

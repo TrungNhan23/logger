@@ -49,25 +49,10 @@ jobs:
     # --- Run all test binaries in build/test ---
     - name: Run all tests
       run: ./scripts/run_dev.sh ./scripts/build_native.sh run
+    
     # --- Collect Coverage ---
-    # - name: Capture Coverage
-    #   run: |
-    #     lcov --capture --directory build --output-file coverage.info
-
-    #     # Remove unwanted coverage paths
-    #     lcov --remove coverage.info \
-    #         '/usr/*' \
-    #         '*/third-party/googletest/*' \
-    #         '*/build/test/*' \
-    #         --output-file coverage.info
-
-    #     # Show coverage summary in logs
-    #     lcov --list coverage.info
-
-    # # --- Generate HTML report ---
-    # - name: Generate Coverage Report
-    #   run: |
-    #     genhtml coverage.info --output-directory coverage_report
+    - name: Capture Coverage and Generate Report
+      run: ./scripts/run_dev.sh ./scripts/get_coverage_report.sh
 
     # --- Upload as GitHub artifact ---
     # - name: Upload Coverage Report

@@ -45,9 +45,25 @@ public:
       *
       * @param level The minimum severity level to log.
       */
-    void setLevel(logLevel& level);
+    void setCurrentLevel(LogLevel level);
 
+    /**
+      * @brief get the current log level.
+      *
+      * Messages below this level will be ignored.
+      *
+      * @return The current log level.
+      */
+    LogLevel getCurrentLevel() const;
 
+    /**
+      * @brief Adds a log backend to output logs to.
+      *
+      * Each backend implements the ILogBackend interface, allowing for flexible
+      * log output (e.g., console, file,...).
+      *
+      * @param backend Shared pointer to a log backend instance.
+      */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
     
     /**
@@ -55,7 +71,7 @@ public:
       *
       */
     template<typename... Args>
-    void printMessage(logLevel level,
+    void printMessage(LogLevel level,
                               const std::string& file,
                               int line,
                               const std::string& message,
@@ -67,7 +83,7 @@ public:
       // }
 
       // Format the message using LogFormatter
-      auto formattedMessage = LogFormatter::getInstance().format(level, file, line, message, std::forward<Args>(args)...);
+      auto formattedMessage = m_formatter->format(level, file, line, message, std::forward<Args>(args)...);
 
       std::lock_guard<std::mutex> lock(m_logMutex);
       for (const auto& backend : m_logBackends)
@@ -91,7 +107,7 @@ private:
   /**
    * @brief The current log level threshold.
    */
-  logLevel m_level{logLevel::INFO};
+  LogLevel m_level{LogLevel::INFO};
 
   /**
     * @brief Mutex to ensure thread-safe logging.
@@ -105,6 +121,8 @@ private:
     * log output (e.g., console, file, network).
     */
   std::vector<std::shared_ptr<ILogBackend>> m_logBackends;
+
+  std::unique_ptr<LogFormatter> m_formatter{std::make_unique<LogFormatter>()};
 };
 
 } // namespace Logger

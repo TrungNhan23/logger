@@ -28,6 +28,7 @@ RUN apt-get update && \
         curl \
         tar \
         libfmt-dev \
+        lcov \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
