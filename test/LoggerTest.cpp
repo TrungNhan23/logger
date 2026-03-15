@@ -4,11 +4,6 @@
 #include "Logger.hpp"
 #include "ConsoleBackend.h"
 
-// class DummyBackend : public ILogBackend
-// {
-// public:
-//     void write(const std::string& msg) override {}
-// };
 
 TEST(LoggerTest, GetInstance_ReturnSameInstance) {
     auto &instance1 = Helper::Logger::Logger::getInstance();

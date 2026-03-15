@@ -52,14 +52,21 @@ target_compile_definitions(logger_lib PUBLIC PLATFORM_LINUX)
 
 if(ENABLE_COVERAGE)
     message(STATUS "Building with coverage flags")
-    target_compile_options(logger_lib PRIVATE -O0 -g --coverage)
-    target_link_options(logger_lib PRIVATE --coverage)
+    # target_compile_options(logger_lib PRIVATE -O0 -g --coverage)
+    # target_link_options(logger_lib PRIVATE --coverage)
+    add_compile_options(--coverage -O0 -g)
+    add_link_options(--coverage)
 endif()
 
 # =========================================================
 # Build GoogleTest from source (NOT from system!)
 # =========================================================
 add_subdirectory(third-party/googletest)
+
+# =========================================================
+# Example executable
+# =========================================================
+add_subdirectory(example)
 
 # =========================================================
 # Add test folder AFTER coverage + gtest is ready

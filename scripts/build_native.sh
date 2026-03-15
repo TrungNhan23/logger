@@ -50,6 +50,18 @@ run()
         echo_green "Running $testfile"
         "$testfile"
     done
+
+    find build/example -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' example; do
+        echo_green "Running $example"
+        "$example"
+    done
+
+    # if [ -f log.txt ]; then
+    #     echo_green "Contents of log.txt:"
+    #     cat log.txt
+    # else
+    #     echo_red "log.txt not found."
+    # fi
 }
 
 parse_options()

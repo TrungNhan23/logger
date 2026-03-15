@@ -1,11 +1,13 @@
 #include "Log.hpp"
 #include "ConsoleBackend.h"
+#include "FileBackend.h"
 
 int main()
 {
   Helper::Logger::Logger::getInstance().
                           addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
-
+  Helper::Logger::Logger::getInstance().
+                          addBackend(std::make_shared<Helper::Logger::FileBackend>("log.txt"));
 
   LOG_DEBUG("This is a debug message");
   LOG_INFO("This is an info message");
@@ -19,4 +21,6 @@ int main()
     LOG_WARNING("Warning message ", i, " times", " with more details");
     LOG_ERROR("Error message ", i, " times", " with more details");
   }
+  
+  return 0;
 }
