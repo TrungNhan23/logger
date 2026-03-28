@@ -8,7 +8,7 @@
 TEST(LogFormatterTest, GetCurrentTime_ReturnsHHMMSSFormat)
 {
     using namespace Helper::Logger;
-
+    Logger::getInstance().setCurrentLevel(LogLevel::DEBUG);
     Logger::getInstance().addBackend(std::make_shared<ConsoleBackend>());
 
     std::string testMessage = "Test log message";
