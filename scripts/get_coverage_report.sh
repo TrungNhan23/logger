@@ -18,9 +18,9 @@ echo "=== Filtering unwanted paths ==="
 lcov --remove "$OUTPUT_FILE" \
     '/usr/*' \
     '*/third-party/*' \
-    '*/build/test/*' \
+    '*/build/*' \
     '*/test/*' \
-    '*/include/*' \
+    '*/example/*' \
     --output-file "$OUTPUT_FILE"
 
 echo "=== Coverage summary ==="

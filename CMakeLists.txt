@@ -41,7 +41,7 @@ target_link_libraries(
 
 target_include_directories(logger_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}/config
+    # ${CMAKE_SOURCE_DIR}/src
 )
 
 target_include_directories(better_enums INTERFACE
@@ -52,10 +52,8 @@ target_compile_definitions(logger_lib PUBLIC PLATFORM_LINUX)
 
 if(ENABLE_COVERAGE)
     message(STATUS "Building with coverage flags")
-    # target_compile_options(logger_lib PRIVATE -O0 -g --coverage)
-    # target_link_options(logger_lib PRIVATE --coverage)
-    add_compile_options(--coverage -O0 -g)
-    add_link_options(--coverage)
+    target_compile_options(logger_lib PRIVATE -O0 -g --coverage)
+    target_link_options(logger_lib PRIVATE --coverage)
 endif()
 
 # =========================================================

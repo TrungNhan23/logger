@@ -77,10 +77,20 @@ public:
                               const std::string& message,
                               Args&&... args)
     {
-      // if (level < m_level)
-      // {
-      //     return;
-      // }
+      // For handle log level filtering, we can check the current log level before formatting the message.
+      // Only log all when the verbose level is set, otherwise log only messages with level equal or higher than the current log level.
+      // If the current log level is NONE, only log ERROR messages.
+      if (m_level._to_integral() == LogLevel::NONE)
+      {
+          if (level._to_integral() != LogLevel::ERROR)
+          {
+              return;
+          }
+      }
+      else if (level < m_level)
+      {
+          return;
+      }
 
       // Format the message using LogFormatter
       auto formattedMessage = m_formatter->format(level, file, line, message, std::forward<Args>(args)...);
