@@ -59,7 +59,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: coverage_report/index.html
+        path: coverage_report/index.html #TODO: currently github can't find this file, need to check if the path is correct
   
     - name: Cleaning build artifacts
       if: always()
