@@ -20,5 +20,5 @@ target_link_libraries(test_logger
 include(GoogleTest)
 gtest_discover_tests(test_logger)
 
-target_compile_options(test_logger PRIVATE --coverage)
+target_compile_options(test_logger PRIVATE -O0 -g --coverage)
 target_link_options(test_logger PRIVATE --coverage)
