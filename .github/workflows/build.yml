@@ -59,7 +59,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-report
-        path: coverage_report/
+        path: coverage_report/index.html
   
     - name: Cleaning build artifacts
       if: always()
