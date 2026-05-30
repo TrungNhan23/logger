@@ -22,9 +22,5 @@ RUN cd /usr/src/googletest && \
     cmake . && make && \
     cp lib/*.a /usr/local/lib
 
-# Add non-root user
-RUN useradd -ms /bin/bash runner && \
-    echo "runner ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-USER ${USER:-}
-WORKDIR /home/${USER:-}
+RUN groupadd -g 1000 user && \
+    useradd -m -u 1000 -g 1000 user

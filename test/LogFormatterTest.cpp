@@ -1,9 +1,10 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <regex>
 
+#include "ConsoleBackend.hpp"
 #include "Log.hpp"
-#include "ConsoleBackend.h"
 
 TEST(LogFormatterTest, GetCurrentTime_ReturnsHHMMSSFormat)
 {

@@ -29,6 +29,7 @@ RUN apt-get update && \
         tar \
         libfmt-dev \
         lcov \
+        gdb \
         ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 

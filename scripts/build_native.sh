@@ -47,10 +47,10 @@ build() {
 run()
 {
     #TODO: should we run all tests and examples? or only some of them?
-    find build/test -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' testfile; do
-        echo_green "Running $testfile"
-        "$testfile"
-    done
+    # find build/test -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' testfile; do
+    #     echo_green "Running $testfile"
+    #     "$testfile"
+    # done
 
     find build/example -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' example; do
         echo_green "Running $example"

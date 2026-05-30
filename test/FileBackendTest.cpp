@@ -1,13 +1,12 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
+#include "FileBackend.hpp"
 #include "Log.hpp"
-#include "FileBackend.h"
-
 
 TEST(FileBackendTest, Write_CallsWriteMethod)
 {
-    std::string filename = "testLogFile.txt";
+    std::string filename = "testLogFile.log";
 
     auto backend = std::make_shared<Helper::Logger::FileBackend>(filename);
     Helper::Logger::Logger::getInstance().addBackend(backend);
