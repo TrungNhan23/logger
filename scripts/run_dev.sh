@@ -19,6 +19,9 @@ get_docker_history_command
 # no param → start container interactive
 if [ $# -eq 0 ]; then
   docker run -it \
+    --user $(id -u):$(id -g) \
+    -v /etc/passwd:/etc/passwd:ro \
+    -v /etc/group:/etc/group:ro \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$HISTORY_FILE":/root/.bash_history \
     -v ${REPO_ROOT_DIR}:${REPO_ROOT_DIR} \

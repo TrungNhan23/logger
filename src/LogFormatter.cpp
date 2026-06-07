@@ -11,28 +11,23 @@ namespace Logger
 
 const size_t SIZE_OF_TIMESTAMP = 9; // HH:MM:SS + null terminator
 
-std::string LogFormatter::getCurrentTime() const
+std::string LogFormatter::getCurrentTime()
 {
     const auto now = std::chrono::system_clock::now();
-    const std::time_t TIME_NOW =
-        std::chrono::system_clock::to_time_t(now);
+    const std::time_t TIME_NOW = std::chrono::system_clock::to_time_t(now);
 
-    std::tm localTime{};
+    std::tm localTime {};
 #if defined(_WIN32)
     localtime_s(&localTime, &TIME_NOW);
 #else
     localtime_r(&TIME_NOW, &localTime);
 #endif
 
-    std::array<char, SIZE_OF_TIMESTAMP> buffer{}; // HH:MM:SS
+    std::array<char, SIZE_OF_TIMESTAMP> buffer {}; // HH:MM:SS
 
-    const std::size_t written =
-        std::strftime(buffer.data(),
-                      buffer.size(),
-                      "%H:%M:%S",
-                      &localTime);
+    const std::size_t written = std::strftime(buffer.data(), buffer.size(), "%H:%M:%S", &localTime);
 
-    return {buffer.data(), written};
+    return { buffer.data(), written };
 }
 
 } // namespace Logger

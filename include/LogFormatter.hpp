@@ -1,14 +1,14 @@
-#pragma once
+#ifndef LOGGER_INCLUDE_LOGFORMATTER_HPP // NOLINT(llvm-header-guard)
+#define LOGGER_INCLUDE_LOGFORMATTER_HPP
 
-#include <string>
 #include <array>
-// #include <cstdarg>
-// #include <cstdio>
-#include <fmt/format.h>
-#include <vector>
 #include <chrono>
 #include <ctime>
 #include <sstream>
+#include <string>
+#include <vector>
+
+#include <fmt/format.h>
 
 #include "LogLevel.hpp"
 
@@ -105,31 +105,19 @@ public:
      * @return Fully formatted log string.
      */
     template<typename... Args>
-    std::string format(LogLevel level,
-                       const std::string& file,
-                       int line,
-                       const std::string& message,
-                       Args&&... args)
+    std::string format(LogLevel level, const std::string& file, int line, const std::string& message, Args&&... args)
     {
-        // std::string msg = fmt::format(message, std::forward<Args>(args)...);
         std::ostringstream oss;
 
         oss << file << ":" << line << " ";
 
-        if (level._to_integral() == LogLevel::DEBUG ||
-            level._to_integral() == LogLevel::ERROR)
+        if (level._to_integral() == LogLevel::DEBUG || level._to_integral() == LogLevel::ERROR)
         {
             oss << getCurrentTime() << " ";
         }
 
-        oss << "[" << level._to_string() << "] "
-            << ([](auto&&... args)
-                {
-                    std::ostringstream oss;
-                    (oss << ... << std::forward<decltype(args)>(args));
-                    return oss.str();
-
-                }(message, std::forward<Args>(args)...));
+        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
+        oss << "[" << level._to_string() << "] " << formatted;
 
         return oss.str();
     }
@@ -147,6 +135,8 @@ public:
      * Prevents assignment of singleton instance.
      */
     LogFormatter& operator=(const LogFormatter&) = delete;
+    LogFormatter(LogFormatter&&) = delete;
+    LogFormatter& operator=(LogFormatter&&) = delete;
 
     /**
      * @brief Private constructor to enforce singleton pattern.
@@ -166,8 +156,9 @@ private:
      *
      * @return Current time as string.
      */
-    std::string getCurrentTime() const;
+    static std::string getCurrentTime();
 };
 
 } // namespace Logger
 } // namespace Helper
+#endif // LOGGER_INCLUDE_LOGFORMATTER_HPP

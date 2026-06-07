@@ -1,41 +1,76 @@
-BasedOnStyle:  GNU
+Language:               Cpp
+Standard:               c++17
+BasedOnStyle:           WebKit
+ColumnLimit:            140
 AlignAfterOpenBracket: Align
+#AlignConsecutiveAssignments: 'true'
+AlignConsecutiveDeclarations: None
+AlignEscapedNewlines: DontAlign
+AlignOperands: Align
+AlignTrailingComments: false
 AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: true
-AllowShortCaseLabelsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: All
-# Uncommenting these lines will sometimes result in lines following an
-# if(){} or for(){} block being attached to the end of the block.
-# AllowShortIfStatementsOnASingleLine: true
-# AllowShortLoopsOnASingleLine: true
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
-BreakBeforeBraces: Custom
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: 'Yes'
+BinPackArguments: false
+BinPackParameters: false
 BraceWrapping:
   AfterClass:      true
-  AfterControlStatement: true
+  AfterControlStatement: "true"
   AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
+  AfterObjCDeclaration: true
   AfterStruct:     true
   AfterUnion:      true
-  AfterExternBlock: true
   BeforeCatch:     true
   BeforeElse:      true
   IndentBraces:    true
-  SplitEmptyFunction: false
-  SplitEmptyRecord: false
-  SplitEmptyNamespace: false
-ContinuationIndentWidth: 2
-Cpp11BracedListStyle: true
+BreakBeforeBinaryOperators: None
+BreakBeforeBraces: Allman
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: true
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 4
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+DisableFormat: false
+FixNamespaceComments: false
+IncludeBlocks: Preserve
+IndentCaseLabels: true
+IndentPPDirectives: None
+IndentWidth: 4
+IndentWrappedFunctionNames: true
+JavaScriptQuotes: Leave
 KeepEmptyLinesAtTheStartOfBlocks: false
-Language:        Cpp
-MaxEmptyLinesToKeep: 1
-NamespaceIndentation: All
-PenaltyExcessCharacter: 100
-PenaltyReturnTypeOnItsOwnLine: 1
-PointerAlignment: Right
-SortIncludes: false
-SpaceBeforeParens: Never
-SpacesInContainerLiterals: false
-Standard:        Cpp11
+MaxEmptyLinesToKeep: 2
+NamespaceIndentation: None
+PointerAlignment: Left
+ReflowComments: false
+SortIncludes: Never
+SortUsingDeclarations: false
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceInEmptyParentheses: false
+SpacesInAngles: Never
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: true
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+TabWidth: 4
+UseTab: Never

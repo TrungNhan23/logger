@@ -1,12 +1,18 @@
+#include "Logger.hpp"
+
 #include <memory>
 #include <string>
-
-#include "Logger.hpp"
 
 namespace Helper
 {
 namespace Logger
 {
+
+Logger::Logger()
+    : m_formatter { std::make_unique<LogFormatter>() }
+    , m_level { LogLevel::INFO }
+{
+}
 
 Logger& Logger::getInstance()
 {

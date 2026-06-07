@@ -23,7 +23,7 @@ file(GLOB LOGGER_SOURCES CONFIGURE_DEPENDS
 # =========================================================
 add_library(better_enums INTERFACE)
 
-target_include_directories(better_enums INTERFACE
+target_include_directories(better_enums SYSTEM INTERFACE
     ${CMAKE_SOURCE_DIR}/third-party/better-enums
 )
 
@@ -44,7 +44,7 @@ target_include_directories(logger_lib PUBLIC
     # ${CMAKE_SOURCE_DIR}/src
 )
 
-target_include_directories(better_enums INTERFACE
+target_include_directories(better_enums SYSTEM INTERFACE
     ${CMAKE_SOURCE_DIR}/third-party/better-enums
 )
 
@@ -75,27 +75,35 @@ add_subdirectory(test)
 # Lint config
 # =========================================================
 if(ENABLE_LINT)
-    find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+    find_program(CLANG_TIDY_EXE NAMES clang-tidy)   
     if(CLANG_TIDY_EXE)
-        message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-
-        file(GLOB_RECURSE ALL_SOURCE_FILES
-            ${CMAKE_SOURCE_DIR}/src/*.c
-            ${CMAKE_SOURCE_DIR}/src/*.cpp
-            ${CMAKE_SOURCE_DIR}/include/*.h
-        )
 
         add_custom_target(lint
-            COMMAND ${CLANG_TIDY_EXE}
-                -p ${CMAKE_BINARY_DIR}
-                --use-color
-                --quiet
-                ${ALL_SOURCE_FILES}
-            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             COMMENT "Running clang-tidy"
-            VERBATIM
         )
 
+        file(GLOB_RECURSE ALL_SOURCE_FILES
+            ${CMAKE_SOURCE_DIR}/src/*.cpp
+            ${CMAKE_SOURCE_DIR}/include/*.hpp
+        )
+
+        list(FILTER ALL_SOURCE_FILES EXCLUDE REGEX ".*/third-party/.*")
+
+        set(LINT_COMMANDS)
+
+        foreach(FILE ${ALL_SOURCE_FILES})
+            add_custom_command(
+                TARGET lint
+                POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E echo "Checked ${FILE}"
+                COMMAND ${CLANG_TIDY_EXE}
+                    -p ${CMAKE_BINARY_DIR}
+                    --quiet
+                    "--header-filter=^${CMAKE_SOURCE_DIR}/(include|src)/"
+                    ${FILE}
+                VERBATIM
+            )
+        endforeach()
     else()
         message(WARNING "clang-tidy not found, 'make lint' will be unavailable")
     endif()
