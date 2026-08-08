@@ -8,6 +8,7 @@
 #include "ILogBackend.hpp"
 #include "LogFormatter.hpp"
 #include "LogLevel.hpp"
+#include "LogFormatterConfigParser.hpp"
 
 namespace Helper
 {
@@ -16,27 +17,30 @@ namespace Logger
 
 /**
  * @class Logger
- * @brief Thread-safe singleton logger that outputs formatted logs to console.
+ * @brief Thread-safe logger service that outputs formatted logs to multiple backends.
  *
  * This logger provides:
  * - Log level filtering
  * - printf-style formatted logging
- * - Thread-safe console output
+ * - Thread-safe output to multiple backends (console, file, etc.)
+ * - Configurable formatting via YAML config file
  *
- * Designed as a simple base logger suitable for Linux or desktop environments.
+ * Designed as a service component suitable for Linux or desktop environments.
  * Not intended for ISR or hard real-time environments.
+ *
+ * @note This class should not define as a singleton. Create one instance and manage it via
+ *       dependency injection or a service registry.
  */
 class Logger
 {
 public:
     /**
-     * @brief Returns the singleton instance of Logger.
+     * @brief Constructs a Logger instance with configuration from YAML file.
      *
-     * Thread-safe since C++11.
-     *
-     * @return Reference to the global Logger instance.
+     * @param configFilePath Path to the YAML configuration file containing
+     *                        format and backends configuration.
      */
-    static Logger& getInstance();
+    explicit Logger(const std::string& configFilePath);
 
     /**
      * @brief Sets the minimum log level.
@@ -71,7 +75,7 @@ public:
      *
      */
     template<typename... Args>
-    void printMessage(LogLevel level, const std::string& file, int line, const std::string& message, Args&&... args)
+    void printMessage(LogLevel level, const std::string& message, Args&&... args)
     {
         // For handle log level filtering, we can check the current log level
         // before formatting the message. Only log all when the verbose level is
@@ -90,7 +94,7 @@ public:
             return;
         }
 
-        auto formattedMessage = m_formatter->format(level, file, line, message, std::forward<Args>(args)...);
+        auto formattedMessage = m_formatter->format(level, message, std::forward<Args>(args)...);
 
         std::lock_guard<std::mutex> lock(m_logMutex);
         for (const auto& backend : m_logBackends)
@@ -105,12 +109,6 @@ public:
     Logger& operator=(Logger&&) = delete;
     ~Logger() = default;
 
-protected:
-    /**
-     * @brief Private constructor to enforce singleton pattern.
-     */
-    Logger();
-
 private:
     /**
      * @brief The current log level threshold.
@@ -123,6 +121,13 @@ private:
     std::mutex m_logMutex;
 
     /**
+    * @brief Path to the YAML configuration file.
+    *
+    * Used for reference and potential reloading of configuration at runtime.
+    */
+    std::string m_logConfigFilePath;
+
+    /**
      * @brief List of log backends to output logs to.
      *
      * Each backend implements the ILogBackend interface, allowing for flexible
@@ -130,7 +135,16 @@ private:
      */
     std::vector<std::shared_ptr<ILogBackend>> m_logBackends;
 
+    /*
+     * @brief Log formatter instance used to format log messages according to
+     *        the specified formatting policy.
+     */
     std::unique_ptr<LogFormatter> m_formatter;
+
+    /*
+     * @brief Configuration parser for initializing logger settings from a YAML file.
+     */
+    std::shared_ptr<LogFormatterConfigParser> m_loggerConfigParser;
 };
 
 } // namespace Logger

@@ -7,6 +7,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <optional>
 
 #include <fmt/format.h>
 
@@ -18,56 +19,6 @@ namespace Logger
 {
 
 constexpr size_t SIZE_OF_BUFFER = 1024; // Buffer size for formatted messages
-
-/**
- * @struct LogFormat
- * @brief Represents a fully formatted log record including metadata.
- *
- * This structure contains all contextual information required
- * to represent a log message after formatting.
- *
- * It is typically produced by a LogFormatter and consumed
- * by a log backend (e.g., console, file, network).
- */
-struct LogFormat
-{
-    /**
-     * @brief Timestamp of the log entry.
-     *
-     * Expected to be pre-formatted as a human-readable string,
-     * e.g., "12:00:00.123".
-     */
-    std::string m_timestamp;
-
-    /**
-     * @brief String representation of the log severity level.
-     *
-     * Example values: "DEBUG", "INFO", "WARN", "ERROR".
-     */
-    std::string m_level;
-
-    /**
-     * @brief Source file where the log was generated.
-     *
-     * Typically provided using the __FILE__ macro.
-     */
-    std::string m_file;
-
-    /**
-     * @brief Line number in the source file.
-     *
-     * Typically provided using the __LINE__ macro.
-     */
-    uint32_t m_line;
-
-    /**
-     * @brief Final formatted log message content.
-     *
-     * Contains the user-provided message after
-     * printf-style formatting (if applicable).
-     */
-    std::string m_message;
-}; // may usde in future for structured logging or log backends
 
 /**
  * @class LogFormatter
@@ -105,11 +56,9 @@ public:
      * @return Fully formatted log string.
      */
     template<typename... Args>
-    std::string format(LogLevel level, const std::string& file, int line, const std::string& message, Args&&... args)
+    std::string format(LogLevel level,/*  const std::string& file, int line,  */const std::string& message, Args&&... args)
     {
         std::ostringstream oss;
-
-        oss << file << ":" << line << " ";
 
         if (level._to_integral() == LogLevel::DEBUG || level._to_integral() == LogLevel::ERROR)
         {

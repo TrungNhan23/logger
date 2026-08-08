@@ -9,7 +9,7 @@
 // This is a simple example to demonstrate the usage of the Logger class.
 // It logs messages with different log levels and shows how the log level
 // filtering works.
-void logMessagesWithLevelsVerbose()
+/* void logMessagesWithLevelsVerbose()
 {
     Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
 
@@ -105,19 +105,17 @@ void testWithTimeMesurement()
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "Time taken with logging a message: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-              << " microseconds\n";
+    LOG_DEBUG("Time taken with logging a message: {} microseconds", std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
 }
-
+ */
 int main()
 {
-    Helper::Logger::Logger::getInstance().addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
-    Helper::Logger::Logger::getInstance().addBackend(std::make_shared<Helper::Logger::FileBackend>("log_example.log"));
+    auto logger = std::make_unique<Helper::Logger::Logger>("/home/user/logger/config/LogConfig.yaml");
 
-    logMessagesWithLevelsVerbose();
+/*     logMessagesWithLevelsVerbose();
     logMessagesWithLevelsInfo();
     logMessagesWithLevelsNone();
 
-    testWithTimeMesurement();
+    testWithTimeMesurement(); */
     return 0;
 }
