@@ -1,10 +1,13 @@
 #pragma once // NOLINT(llvm-header-guard)
+#pragma once // NOLINT(llvm-header-guard)
 
 #include <memory>
+#include <mutex>
 #include <mutex>
 #include <string>
 #include <vector>
 
+#include "ILogBackend.hpp"
 #include "ILogBackend.hpp"
 #include "LogFormatter.hpp"
 #include "LogLevel.hpp"
@@ -49,9 +52,21 @@ public:
      *
      * @param level The minimum severity level to log.
      */
+     * @brief Sets the minimum log level.
+     *
+     * Messages below this level will be ignored.
+     *
+     * @param level The minimum severity level to log.
+     */
     void setCurrentLevel(LogLevel level);
 
     /**
+     * @brief get the current log level.
+     *
+     * Messages below this level will be ignored.
+     *
+     * @return The current log level.
+     */
      * @brief get the current log level.
      *
      * Messages below this level will be ignored.
@@ -68,15 +83,42 @@ public:
      *
      * @param backend Shared pointer to a log backend instance.
      */
+     * @brief Adds a log backend to output logs to.
+     *
+     * Each backend implements the ILogBackend interface, allowing for flexible
+     * log output (e.g., console, file,...).
+     *
+     * @param backend Shared pointer to a log backend instance.
+     */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
 
+
     /**
+     * @brief Adds a log backend to output logs to.
+     *
+     */
      * @brief Adds a log backend to output logs to.
      *
      */
     template<typename... Args>
     void printMessage(LogLevel level, const std::string& message, Args&&... args)
     {
+        // For handle log level filtering, we can check the current log level
+        // before formatting the message. Only log all when the verbose level is
+        // set, otherwise log only messages with level equal or higher than the
+        // current log level. If the current log level is NONE, only log ERROR
+        // messages.
+        if (m_level._to_integral() == LogLevel::NONE)
+        {
+            if (level._to_integral() != LogLevel::ERROR)
+            {
+                return;
+            }
+        }
+        else if (level < m_level)
+        {
+            return;
+        }
         // For handle log level filtering, we can check the current log level
         // before formatting the message. Only log all when the verbose level is
         // set, otherwise log only messages with level equal or higher than the
@@ -101,7 +143,13 @@ public:
         {
             backend->write(formattedMessage);
         }
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        for (const auto& backend : m_logBackends)
+        {
+            backend->write(formattedMessage);
+        }
     }
+
 
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
@@ -110,6 +158,10 @@ public:
     ~Logger() = default;
 
 private:
+    /**
+     * @brief The current log level threshold.
+     */
+    LogLevel m_level;
     /**
      * @brief The current log level threshold.
      */

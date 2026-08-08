@@ -1,6 +1,9 @@
 #pragma once // NOLINT(llvm-header-guard)
+#pragma once // NOLINT(llvm-header-guard)
 
 #include "Logger.hpp"
+
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 

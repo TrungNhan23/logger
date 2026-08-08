@@ -1,5 +1,7 @@
 #ifndef LOGGER_INCLUDE_LOGFORMATTER_HPP // NOLINT(llvm-header-guard)
 #define LOGGER_INCLUDE_LOGFORMATTER_HPP
+#ifndef LOGGER_INCLUDE_LOGFORMATTER_HPP // NOLINT(llvm-header-guard)
+#define LOGGER_INCLUDE_LOGFORMATTER_HPP
 
 #include <array>
 #include <chrono>
@@ -67,6 +69,8 @@ public:
 
         std::string formatted = fmt::format(message, std::forward<Args>(args)...);
         oss << "[" << level._to_string() << "] " << formatted;
+        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
+        oss << "[" << level._to_string() << "] " << formatted;
 
         return oss.str();
     }
@@ -84,6 +88,8 @@ public:
      * Prevents assignment of singleton instance.
      */
     LogFormatter& operator=(const LogFormatter&) = delete;
+    LogFormatter(LogFormatter&&) = delete;
+    LogFormatter& operator=(LogFormatter&&) = delete;
     LogFormatter(LogFormatter&&) = delete;
     LogFormatter& operator=(LogFormatter&&) = delete;
 
@@ -106,8 +112,10 @@ private:
      * @return Current time as string.
      */
     static std::string getCurrentTime();
+    static std::string getCurrentTime();
 };
 
 } // namespace Logger
 } // namespace Helper
+#endif // LOGGER_INCLUDE_LOGFORMATTER_HPP
 #endif // LOGGER_INCLUDE_LOGFORMATTER_HPP
