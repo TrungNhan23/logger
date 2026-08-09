@@ -4,24 +4,20 @@
 
 #include "ConsoleBackend.hpp"
 #include "FileBackend.hpp"
-#include <thread>
-#include <vector>
-#include <iostream>
-
-#include "ConsoleBackend.hpp"
-#include "FileBackend.hpp"
+#include "LogProvider.hpp"
 #include "Log.hpp"
 
 // This is a simple example to demonstrate the usage of the Logger class.
 // It logs messages with different log levels and shows how the log level
 // filtering works.
-/* void logMessagesWithLevelsVerbose()
+void logMessagesWithLevelsVerbose()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
 
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is ", lg->getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is ", lg->getCurrentLevel(), " so this message should be logged");
 
     LOG_DEBUG("This is a debug message");
     LOG_INFO("This is an info message");
@@ -50,11 +46,12 @@
 
 void logMessagesWithLevelsInfo()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::INFO);
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::INFO);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::INFO);
 
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is ", lg->getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is ", lg->getCurrentLevel(), " so this message should be logged");
 
     LOG_DEBUG("This is a debug message");
     LOG_INFO("This is an info message");
@@ -83,16 +80,16 @@ void logMessagesWithLevelsInfo()
 
 // This function is to test the NONE log level, which should only log ERROR
 // messages.
-// This function is to test the NONE log level, which should only log ERROR
-// messages.
 void logMessagesWithLevelsNone()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::NONE);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::NONE);
     LOG_DEBUG("This is a debug message");
     LOG_INFO("This is an info message");
     LOG_WARNING("This is a warning message");
     LOG_ERROR("This is an error message");
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::NONE);
+    lg->setCurrentLevel(Helper::Logger::LogLevel::NONE);
     LOG_DEBUG("This is a debug message");
     LOG_INFO("This is an info message");
     LOG_WARNING("This is a warning message");
@@ -140,7 +137,9 @@ void testWithMultiThreading()
 
 void testWithTimeMesurement()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
     auto start = std::chrono::steady_clock::now();
 
     for (int i = 0; i < 100000; ++i)
@@ -153,15 +152,23 @@ void testWithTimeMesurement()
 
     LOG_DEBUG("Time taken with logging a message: {} microseconds", std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
 }
- */
+
 int main()
 {
-    auto logger = std::make_unique<Helper::Logger::Logger>("/home/user/logger/config/LogConfig.yaml");
+    auto logger_ptr = std::make_shared<Helper::Logger::Logger>("/home/user/logger/example/config/LogConfig.yaml");
+    Helper::Logger::setDefaultLogger(logger_ptr);
+    // Add a console backend so example logs are visible.
+    if (auto lg = Helper::Logger::defaultLogger())
+    {
+        lg->addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
+        LOG_INFO("Example logger initialized");
+    }
 
 /*     logMessagesWithLevelsVerbose();
     logMessagesWithLevelsInfo();
     logMessagesWithLevelsNone();
 
-    testWithTimeMesurement(); */
+    testWithTimeMesurement();
+ */
     return 0;
 }

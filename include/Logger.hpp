@@ -63,6 +63,7 @@ public:
      */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
 
+    static Logger getInstance();
 
     template<typename... Args>
     void printMessage(LogLevel level, const std::string& message, Args&&... args)

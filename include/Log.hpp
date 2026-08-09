@@ -1,20 +1,19 @@
 #pragma once // NOLINT(llvm-header-guard)
-#pragma once // NOLINT(llvm-header-guard)
 
-#include "Logger.hpp"
+#include "LogProvider.hpp"
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
 #define LOG_DEBUG(fmt, ...) \
-    Helper::Logger::Logger::getInstance().printMessage(Helper::Logger::LogLevel::DEBUG,/*  __FILE__, __LINE__, */ fmt, ##__VA_ARGS__)
+    do { auto lg = Helper::Logger::defaultLogger(); if (lg) lg->printMessage(Helper::Logger::LogLevel::DEBUG, fmt, ##__VA_ARGS__); } while (0)
 
 #define LOG_INFO(fmt, ...) \
-    Helper::Logger::Logger::getInstance().printMessage(Helper::Logger::LogLevel::INFO,/*  __FILE__, __LINE__, */ fmt, ##__VA_ARGS__)
+    do { auto lg = Helper::Logger::defaultLogger(); if (lg) lg->printMessage(Helper::Logger::LogLevel::INFO, fmt, ##__VA_ARGS__); } while (0)
 
 #define LOG_WARNING(fmt, ...) \
-    Helper::Logger::Logger::getInstance().printMessage(Helper::Logger::LogLevel::WARNING,/*  __FILE__, __LINE__, */ fmt, ##__VA_ARGS__)
+    do { auto lg = Helper::Logger::defaultLogger(); if (lg) lg->printMessage(Helper::Logger::LogLevel::WARNING, fmt, ##__VA_ARGS__); } while (0)
 
 #define LOG_ERROR(fmt, ...) \
-    Helper::Logger::Logger::getInstance().printMessage(Helper::Logger::LogLevel::ERROR,/*  __FILE__, __LINE__, */ fmt, ##__VA_ARGS__)
+    do { auto lg = Helper::Logger::defaultLogger(); if (lg) lg->printMessage(Helper::Logger::LogLevel::ERROR, fmt, ##__VA_ARGS__); } while (0)
 
 // NOLINTEND(cppcoreguidelines-macro-usage)

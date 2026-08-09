@@ -5,6 +5,9 @@
 #include <fstream>
 #include <sstream>
 
+
+#include <iostream>
+
 namespace Helper::Logger
 {
 
@@ -71,6 +74,65 @@ bool parseBackendProperty(BackendConfig& current, const std::string& key, const 
     }
 
     return false;
+}
+
+bool isCommentOrEmpty(const std::string& content)
+{
+    return content.empty() || content[0] == '#';
+}
+
+bool tryEnterBackendsSection(bool& inBackendsSection, int& backendsParentIndent, int indent, bool isNameLine, const std::string& key)
+{
+    if (!inBackendsSection && isNameLine && key == "backends")
+    {
+        inBackendsSection = true;
+        backendsParentIndent = indent;
+        return true;
+    }
+    return false;
+}
+
+bool tryHandleSectionExit(std::ifstream& configFile, std::streampos linePos, bool inBackendsSection, int indent, int backendsParentIndent,
+                          std::vector<BackendConfig>& backends, BackendConfig& current, bool& hasCurrent)
+{
+    if (inBackendsSection && indent <= backendsParentIndent)
+    {
+        if (hasCurrent)
+        {
+            backends.push_back(current);
+        }
+        configFile.seekg(linePos);
+        return true;
+    }
+    return false;
+}
+
+bool tryHandleBackendNameLine(std::vector<BackendConfig>& backends, BackendConfig& current, bool& hasCurrent,
+                              int indent, int backendsParentIndent, int& currentBackendIndent,
+                              const std::string& key, bool isNameLine)
+{
+    if (isNameLine && indent > backendsParentIndent)
+    {
+        if (hasCurrent)
+        {
+            backends.push_back(current);
+        }
+        hasCurrent = tryInitBackendFromKey(key, current);
+        currentBackendIndent = indent;
+        return true;
+    }
+    return false;
+}
+
+bool tryHandlePropertyLine(BackendConfig& current, bool hasCurrent, int indent, int currentBackendIndent,
+                           const std::string& key, const std::string& value)
+{
+    if (!hasCurrent || indent <= currentBackendIndent)
+    {
+        return false;
+    }
+    parseBackendProperty(current, key, value);
+    return true;
 }
 
 } // namespace
@@ -169,18 +231,13 @@ std::vector<BackendConfig> LogFormatterConfigParser::getBackendConfigsByParsing(
     std::vector<BackendConfig> backends;
     BackendConfig current;
     bool hasCurrent = false;
-    int backendIndent = -1;
-
-    auto flush = [&]()
-    {
-        if (hasCurrent)
-        {
-            backends.push_back(current);
-        }
-    };
 
     std::streampos linePos;
     std::string raw;
+
+    bool inBackendsSection = false;
+    int backendsParentIndent = -1; // indent of the `backends:` header
+    int currentBackendIndent = -1; // indent of the active backend name (e.g., 'console:')
 
     while ((linePos = configFile.tellg()), std::getline(configFile, raw))
     {
@@ -191,7 +248,7 @@ std::vector<BackendConfig> LogFormatterConfigParser::getBackendConfigsByParsing(
         }
 
         std::string content = trim(raw.substr(indentPos));
-        if (content.empty() || content[0] == '#')
+        if (isCommentOrEmpty(content))
         {
             continue;
         }
@@ -206,32 +263,40 @@ std::vector<BackendConfig> LogFormatterConfigParser::getBackendConfigsByParsing(
 
         std::string key = trim(content.substr(0, colon));
         std::string value = removeQuotes(trim(content.substr(colon + 1)));
-        bool isBackendNameLine = value.empty();
+        bool isNameLine = value.empty();
 
-        if (isBackendNameLine && (backendIndent == -1 || indent <= backendIndent))
+        if (!inBackendsSection)
         {
-            flushBackend(backends, hasCurrent, current);
-            backendIndent = indent;
-            hasCurrent = tryInitBackendFromKey(key, current);
+            if (tryEnterBackendsSection(inBackendsSection, backendsParentIndent, indent, isNameLine, key))
+            {
+                continue;
+            }
             continue;
         }
 
-        if (indent <= backendIndent)
+        if (tryHandleSectionExit(configFile, linePos, inBackendsSection, indent, backendsParentIndent, backends, current, hasCurrent))
         {
-            flushBackend(backends, hasCurrent, current);
-            configFile.seekg(linePos);
             return backends;
         }
 
-        if (!hasCurrent)
+        if (tryHandleBackendNameLine(backends, current, hasCurrent, indent, backendsParentIndent, currentBackendIndent, key, isNameLine))
         {
             continue;
         }
 
-        parseBackendProperty(current, key, value);
+        if (tryHandlePropertyLine(current, hasCurrent, indent, currentBackendIndent, key, value))
+        {
+            continue;
+        }
+
+        // otherwise ignore the line
     }
 
-    flush();
+    if (hasCurrent)
+    {
+        backends.push_back(current);
+    }
+
     return backends;
 }
 

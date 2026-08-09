@@ -9,8 +9,13 @@ TEST(ConsoleBackendTest, Write_CallsWriteMethod)
     using ::testing::HasSubstr;
     testing::internal::CaptureStdout();
 
+    // ensure a default logger exists via provider
+    Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
+    auto logger = Helper::Logger::defaultLogger();
+    ASSERT_NE(logger, nullptr);
+
     auto backend = std::make_shared<Helper::Logger::ConsoleBackend>();
-    Helper::Logger::Logger::getInstance().addBackend(backend);
+    logger->addBackend(backend);
 
     std::string testMessage = "Test log message";
 

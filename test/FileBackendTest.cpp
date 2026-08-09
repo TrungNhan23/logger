@@ -8,8 +8,13 @@ TEST(FileBackendTest, Write_CallsWriteMethod)
 {
     std::string filename = "testLogFile.log";
 
+    // ensure a default logger exists via provider
+    Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
+    auto logger = Helper::Logger::defaultLogger();
+    ASSERT_NE(logger, nullptr);
+
     auto backend = std::make_shared<Helper::Logger::FileBackend>(filename);
-    Helper::Logger::Logger::getInstance().addBackend(backend);
+    logger->addBackend(backend);
 
     std::string testMessage = "Test log message with file backend";
 
