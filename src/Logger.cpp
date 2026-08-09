@@ -5,15 +5,13 @@
 #include <memory>
 #include <string>
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
-Logger::Logger(const std::string& configFilePath)
+Logger::Logger(std::string configFilePath)
     : m_formatter { std::make_unique<LogFormatter>() }
     , m_level { LogLevel::INFO }
-    , m_logConfigFilePath { configFilePath }
+    , m_logConfigFilePath { std::move(configFilePath) }
 {
     if (!m_logConfigFilePath.empty())
     {
@@ -65,5 +63,4 @@ void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
     m_logBackends.push_back(backend);
 }
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

@@ -5,8 +5,6 @@
 
 // NOLINTBEGIN(cppcoreguidelines-macro-usage)
 
-// NOLINTBEGIN(cppcoreguidelines-macro-usage)
-
 #define LOG_DEBUG(fmt, ...) \
     Helper::Logger::Logger::getInstance().printMessage(Helper::Logger::LogLevel::DEBUG,/*  __FILE__, __LINE__, */ fmt, ##__VA_ARGS__)
 

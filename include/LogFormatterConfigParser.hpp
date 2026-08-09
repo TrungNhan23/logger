@@ -1,18 +1,16 @@
 #pragma once // NOLINT(llvm-header-guard)
 
 #include <array>
+#include <map>
 #include <memory>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <optional>
-#include <map>
 
 #include "LogLevel.hpp"
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 /**
@@ -34,17 +32,17 @@ struct BackendConfig
     /**
      * @brief Log level for this backend (optional, defaults to inherited level).
      */
-    std::optional<std::string> level;
+    std::optional<std::string> level { std::nullopt };
 
-    /**
+    /** 
      * @brief File path for file backend.
      */
-    std::optional<std::string> path;
+    std::optional<std::string> path { std::nullopt };
 
     /**
      * @brief Maximum number of backup files for file rotation.
      */
-    std::optional<int> max_backups;
+    std::optional<int> max_backups { std::nullopt };
 };
 
 /**
@@ -156,14 +154,14 @@ public:
      *
      * @return Shared pointer to LogFormat containing the fields.
      */
-    LogFormat getFields() const;
+    [[nodiscard]] LogFormat getFields() const;
 
     /**
      * @brief Get all backend configurations parsed from config file.
      *
      * @return Vector of BackendConfig objects.
      */
-    const std::vector<BackendConfig>& getBackendConfigs() const;
+    [[nodiscard]] const std::vector<BackendConfig>& getBackendConfigs() const;
 
     /**
      * @brief Deleted copy constructor.
@@ -176,6 +174,16 @@ public:
     LogFormatterConfigParser& operator=(const LogFormatterConfigParser&) = delete;
 
     /**
+     * @brief Deleted move constructor.
+     */
+    LogFormatterConfigParser(LogFormatterConfigParser&&) noexcept = default;
+
+    /**
+     * @brief Deleted move assignment operator.
+     */
+    LogFormatterConfigParser& operator=(LogFormatterConfigParser&&) noexcept = default;
+
+    /**
      * @brief Destructor.
      */
     ~LogFormatterConfigParser() = default;
@@ -184,35 +192,34 @@ private:
     /**
      * @brief Remove quotes from a string if present.
      */
-    std::string removeQuotes(const std::string& str) const;
+    [[nodiscard]] static std::string removeQuotes(const std::string& str);
 
     /**
      * @brief Get the indentation level of a line.
      */
-    int getIndentLevel(const std::string& line) const;
+    [[nodiscard]] static int getIndentLevel(const std::string& line);
 
     /**
      * @brief Trim leading and trailing whitespace from a string.
      * @param str Input string to trim.
      * @return Trimmed string.
      */
-    std::string trim(const std::string& str) const;
+    [[nodiscard]] static std::string trim(const std::string& str);
 
     /**
      * @brief Parse fields from the configuration file.
      * @param configFile Input file stream of the configuration file.
      * @return LogFormat containing parsed fields.
      */
-    LogFormat getFieldsByParsing(std::ifstream& configFile);
+    [[nodiscard]] static LogFormat getFieldsByParsing(std::ifstream& configFile);
 
     /**
      * @brief Parse backend configurations from the configuration file.
      * @param configFile Input file stream of the configuration file.
      * @return Vector of BackendConfig containing parsed backend configurations.
      */
-    std::vector<BackendConfig> getBackendConfigsByParsing(std::ifstream& configFile);
+    [[nodiscard]] static std::vector<BackendConfig> getBackendConfigsByParsing(std::ifstream& configFile);
 
-private:
     /**
      * @brief List of field names extracted from configuration.
      */
@@ -224,5 +231,4 @@ private:
     std::vector<BackendConfig> m_backendConfigs;
 };
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

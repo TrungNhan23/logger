@@ -5,9 +5,7 @@
 #include <ostream>
 #include <string>
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 FileBackend::FileBackend(const std::string& fileName)
@@ -23,5 +21,4 @@ void FileBackend::write(const std::string& formattedMessage)
     }
 }
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

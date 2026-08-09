@@ -3,9 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 void ConsoleBackend::write(const std::string& formattedMsg)
@@ -13,5 +11,4 @@ void ConsoleBackend::write(const std::string& formattedMsg)
     std::cout << formattedMsg << '\n';
 }
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

@@ -1,9 +1,7 @@
 #pragma once // NOLINT(llvm-header-guard)
 #include <string>
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 /**
@@ -78,5 +76,4 @@ public:
     virtual void write(const std::string& formattedMsg) = 0;
 };
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

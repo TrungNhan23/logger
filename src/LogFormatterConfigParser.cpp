@@ -1,14 +1,79 @@
 #include "LogFormatterConfigParser.hpp"
 
-#include <fstream>
-#include <sstream>
 #include <algorithm>
 #include <cctype>
+#include <fstream>
+#include <sstream>
 
-namespace Helper
+namespace Helper::Logger
 {
-namespace Logger
+
+namespace
 {
+void setFieldByName(LogFormat& format, const std::string& field)
+{
+    if (field == "timestamp") { format.m_timestamp = true; return; }
+    if (field == "level") { format.m_level = true; return; }
+    if (field == "file") { format.m_file = true; return; }
+    if (field == "line") { format.m_line = true; return; }
+    if (field == "module") { format.m_moduleName = true; return; }
+    if (field == "thread_id") { format.m_threadId = true; return; }
+    // "message" is mandatory and implicitly present
+}
+
+bool tryInitBackendFromKey(const std::string& key, BackendConfig& out)
+{
+    try
+    {
+        out = BackendConfig{};
+        out.name = BackendType::_from_string_nocase(key.c_str());
+        if (out.name == +BackendType::FILE) { out.max_backups = 1; }
+        return true;
+    }
+    catch (const std::runtime_error&)
+    {
+        return false;
+    }
+}
+
+void flushBackend(std::vector<BackendConfig>& backends, bool hasCurrent, const BackendConfig& current)
+{
+    if (hasCurrent)
+    {
+        backends.push_back(current);
+    }
+}
+
+bool parseBackendProperty(BackendConfig& current, const std::string& key, const std::string& value)
+{
+    if (key == "enabled")
+    {
+        current.enabled = (value == "true");
+        return true;
+    }
+
+    if (key == "level")
+    {
+        current.level = value;
+        return true;
+    }
+
+    if (key == "path")
+    {
+        current.path = value;
+        return true;
+    }
+
+    if (key == "max_backups")
+    {
+        current.max_backups = std::stoi(value);
+        return true;
+    }
+
+    return false;
+}
+
+} // namespace
 
 LogFormatterConfigParser::LogFormatterConfigParser(const std::string& configFilePath)
 {
@@ -65,14 +130,7 @@ LogFormat LogFormatterConfigParser::getFieldsByParsing(std::ifstream& configFile
             }
 
             std::string field = removeQuotes(trim(content.substr(1)));
-
-            if (field == "timestamp")      format.m_timestamp = true;
-            else if (field == "level")     format.m_level = true;
-            else if (field == "file")      format.m_file = true;
-            else if (field == "line")      format.m_line = true;
-            else if (field == "module")    format.m_moduleName = true;
-            else if (field == "thread_id") format.m_threadId = true;
-            else if (field == "message")   { /* this field is mandatory, always present, no need to set */ }
+            setFieldByName(format, field);
 
             continue;
         }
@@ -152,32 +210,15 @@ std::vector<BackendConfig> LogFormatterConfigParser::getBackendConfigsByParsing(
 
         if (isBackendNameLine && (backendIndent == -1 || indent <= backendIndent))
         {
-            flush();
-            hasCurrent = false;
+            flushBackend(backends, hasCurrent, current);
             backendIndent = indent;
-
-            try
-            {
-                current = BackendConfig{};
-                current.name = BackendType::_from_string_nocase(key.c_str());
-
-                if (current.name == +BackendType::FILE)
-                {
-                    current.max_backups = 1;
-                }
-
-                hasCurrent = true;
-            }
-            catch (const std::runtime_error&)
-            {
-                hasCurrent = false;
-            }
+            hasCurrent = tryInitBackendFromKey(key, current);
             continue;
         }
 
         if (indent <= backendIndent)
         {
-            flush();
+            flushBackend(backends, hasCurrent, current);
             configFile.seekg(linePos);
             return backends;
         }
@@ -187,36 +228,21 @@ std::vector<BackendConfig> LogFormatterConfigParser::getBackendConfigsByParsing(
             continue;
         }
 
-        if (key == "enabled")
-        {
-            current.enabled = (value == "true");
-        }
-        else if (key == "level")
-        {
-            current.level = value;
-        }
-        else if (key == "path")
-        {
-            current.path = value;
-        }
-        else if (key == "max_backups")
-        {
-            current.max_backups = std::stoi(value);
-        }
+        parseBackendProperty(current, key, value);
     }
 
     flush();
     return backends;
 }
 
-int LogFormatterConfigParser::getIndentLevel(const std::string& line) const
+int LogFormatterConfigParser::getIndentLevel(const std::string& line)
 {
     size_t firstNonIndent = line.find_first_not_of(" \t");
     size_t rawIndent = (firstNonIndent == std::string::npos) ? line.size() : firstNonIndent;
     return static_cast<int>(rawIndent) / 2; // Assuming 2-space indentation
 }
 
-std::string LogFormatterConfigParser::removeQuotes(const std::string& str) const
+std::string LogFormatterConfigParser::removeQuotes(const std::string& str)
 {
     std::string result = trim(str);
     if (result.length() >= 2 && result.front() == '"' && result.back() == '"')
@@ -226,7 +252,7 @@ std::string LogFormatterConfigParser::removeQuotes(const std::string& str) const
     return result;
 }
 
-std::string LogFormatterConfigParser::trim(const std::string& str) const
+std::string LogFormatterConfigParser::trim(const std::string& str)
 {
     constexpr const char* whitespace = " \t\n\r\f\v";
 
@@ -240,5 +266,4 @@ std::string LogFormatterConfigParser::trim(const std::string& str) const
     return str.substr(start, end - start + 1);
 }
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

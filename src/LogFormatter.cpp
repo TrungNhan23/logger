@@ -4,9 +4,7 @@
 #include <ctime>
 #include <sstream>
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 const size_t SIZE_OF_TIMESTAMP = 9; // HH:MM:SS + null terminator
@@ -30,5 +28,4 @@ std::string LogFormatter::getCurrentTime()
     return { buffer.data(), written };
 }
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger
