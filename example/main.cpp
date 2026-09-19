@@ -1,10 +1,6 @@
-#include <thread>
 #include <vector>
 #include <iostream>
 
-#include "ConsoleBackend.hpp"
-#include "FileBackend.hpp"
-#include "LogProvider.hpp"
 #include "Log.hpp"
 
 // This is a simple example to demonstrate the usage of the Logger class.
@@ -59,51 +55,12 @@ void logMessagesWithLevelsNone()
     LOG_ERROR("This error message SHOULD be logged");
 }
 
-void testWithMultiThreading()
-{
-    constexpr int THREADS = 4;
-
-    std::vector<std::thread> workers;
-
-    for (int t = 0; t < THREADS; ++t)
-    {
-        workers.emplace_back(
-            []()
-            {
-                for (int i = 0; i < 100; ++i)
-                {
-                    LOG_INFO("Thread worker message: {}", i);
-                }
-            });
-    }
-
-    for (auto& worker : workers)
-    {
-        worker.join();
-    }
-}
-
-void testWithTimeMesurement()
-{
-    auto lg = Helper::Logger::defaultLogger();
-    if (!lg) return;
-    lg->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
-    auto start = std::chrono::steady_clock::now();
-
-    for (int i = 0; i < 1000; ++i)
-    {
-        LOG_DEBUG("Benchmark message {}", i);
-    }
-
-    auto end = std::chrono::steady_clock::now();
-
-    LOG_DEBUG("Time taken for 1000 messages: {} microseconds", std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
-}
 
 int main(int argc, char* argv[])
 {
     std::string configPath = (argc > 1) ? argv[1] : "example/config/LogConfig.yaml";
     auto logger_ptr = std::make_shared<Helper::Logger::Logger>(configPath);
+    logger_ptr->setModuleName("EXAMPLE");
     Helper::Logger::setDefaultLogger(logger_ptr);
 
     LOG_INFO("Example logger initialized from config: {}", configPath);
@@ -111,8 +68,6 @@ int main(int argc, char* argv[])
     logMessagesWithLevelsVerbose();
     logMessagesWithLevelsInfo();
     logMessagesWithLevelsNone();
-    testWithMultiThreading();
-    testWithTimeMesurement();
 
     return 0;
 }

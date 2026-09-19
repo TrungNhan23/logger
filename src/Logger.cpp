@@ -61,6 +61,23 @@ LogLevel Logger::getCurrentLevel() const
     return m_level;
 }
 
+void Logger::setModuleName(const std::string& moduleName)
+{
+    if (m_formatter)
+    {
+        m_formatter->setModuleName(moduleName);
+    }
+}
+
+std::string Logger::getModuleName() const
+{
+    if (m_formatter)
+    {
+        return m_formatter->getModuleName();
+    }
+    return "";
+}
+
 void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
 {
     if (backend)

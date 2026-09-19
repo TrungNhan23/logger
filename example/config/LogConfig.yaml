@@ -2,8 +2,8 @@ logging:
   format:
     fields:
       - timestamp
-      - level
       - module
+      - level
       - message
     separator: " | "
   backends:
