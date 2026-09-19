@@ -32,7 +32,7 @@ struct BackendConfig
     /**
      * @brief Log level for this backend (optional, defaults to inherited level).
      */
-    std::optional<std::string> level { std::nullopt };
+    std::optional<LogLevel> level { std::nullopt };
 
     /** 
      * @brief File path for file backend.
@@ -63,29 +63,26 @@ struct LogFormat
     std::optional<std::string> m_separator;
 
     /**
-     * @brief Timestamp of the log entry.
+     * @brief Bool value that make decision whether to include timestamp in the formatted output.
      *
-     * Expected to be pre-formatted as a human-readable string,
-     * e.g., "12:00:00.123".
      */
     bool m_timestamp { false };
 
     /**
-     * @brief String representation of the log severity level.
+     * @brief Bool value that make decision whether to include log level in the formatted output.
      *
-     * Example values: "DEBUG", "INFO", "WARN", "ERROR".
      */
     bool m_level { false };
 
     /**
-     * @brief Source file where the log was generated.
+     * @brief Bool value that make decision whether to include source file name in the formatted output.
      *
      * Typically provided using the __FILE__ macro.
      */
     bool m_file { false };
 
     /**
-     * @brief Line number in the source file.
+     * @brief Bool value that make decision whether to include source line number in the formatted output.
      *
      * Typically provided using the __LINE__ macro.
      */
@@ -100,12 +97,12 @@ struct LogFormat
     std::string m_message;
 
     /**
-     * @brief Name of the module generating the log.
+     * @brief Bool value that make decision whether to include module name in the formatted output.
      */
     bool m_moduleName { false };
 
     /**
-     * @brief ID of the thread generating the log.
+     * @brief Bool value that make decision whether to include thread ID in the formatted output.
      */
     bool m_threadId { false };
 

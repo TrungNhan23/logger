@@ -9,8 +9,7 @@ namespace Helper::Logger
 {
 
 Logger::Logger(std::string configFilePath)
-    : m_formatter { std::make_unique<LogFormatter>() }
-    , m_level { LogLevel::INFO }
+    : m_level { LogLevel::INFO }
     , m_logConfigFilePath { std::move(configFilePath) }
 {
     if (!m_logConfigFilePath.empty())
@@ -25,15 +24,17 @@ Logger::Logger(std::string configFilePath)
                 continue;
             }
 
+            LogLevel backendLevel = backendConfig.level.value_or(LogLevel::INFO);
+
             if (backendConfig.name == +BackendType::CONSOLE)
             {
-                addBackend(std::make_shared<ConsoleBackend>());
+                m_logBackends.push_back({ backendLevel, std::make_shared<ConsoleBackend>() });
             }
             else if (backendConfig.name == +BackendType::FILE)
             {
                 if (backendConfig.path.has_value())
                 {
-                    addBackend(std::make_shared<FileBackend>(backendConfig.path.value()));
+                    m_logBackends.push_back({ backendLevel, std::make_shared<FileBackend>(backendConfig.path.value()) });
                 }
                 else
                 {
@@ -46,6 +47,8 @@ Logger::Logger(std::string configFilePath)
             }
         }
     }
+
+    m_formatter = std::make_unique<LogFormatter>(m_loggerConfigParser);
 }
 
 void Logger::setCurrentLevel(LogLevel level)
@@ -60,7 +63,11 @@ LogLevel Logger::getCurrentLevel() const
 
 void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
 {
-    m_logBackends.push_back(backend);
+    if (backend)
+    {
+        std::lock_guard<std::mutex> lock(m_logMutex);
+        m_logBackends.push_back({ LogLevel::VERBOSE, backend });
+    }
 }
 
 } // namespace Helper::Logger

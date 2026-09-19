@@ -63,8 +63,6 @@ public:
      */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
 
-    static Logger getInstance();
-
     template<typename... Args>
     void printMessage(LogLevel level, const std::string& message, Args&&... args)
     {
@@ -80,15 +78,22 @@ public:
             return;
         }
 
+        if (!m_formatter)
+        {
+            return;
+        }
+
         auto formattedMessage = m_formatter->format(level, message, std::forward<Args>(args)...);
 
         std::lock_guard<std::mutex> lock(m_logMutex);
-        for (const auto& backend : m_logBackends)
+        for (const auto& backendEntry : m_logBackends)
         {
-            backend->write(formattedMessage);
+            if (backendEntry.backend && level._to_integral() >= backendEntry.level._to_integral())
+            {
+                backendEntry.backend->write(formattedMessage);
+            }
         }
     }
-
 
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;
@@ -97,6 +102,12 @@ public:
     ~Logger() = default;
 
 private:
+    struct BackendEntry
+    {
+        LogLevel level;
+        std::shared_ptr<ILogBackend> backend;
+    };
+
     /**
      * @brief The current log level threshold.
      */
@@ -120,7 +131,7 @@ private:
      * Each backend implements the ILogBackend interface, allowing for flexible
      * log output (e.g., console, file, network).
      */
-    std::vector<std::shared_ptr<ILogBackend>> m_logBackends;
+    std::vector<BackendEntry> m_logBackends;
 
     /*
      * @brief Log formatter instance used to format log messages according to

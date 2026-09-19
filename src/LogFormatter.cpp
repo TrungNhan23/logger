@@ -9,6 +9,11 @@ namespace Helper::Logger
 
 const size_t SIZE_OF_TIMESTAMP = 9; // HH:MM:SS + null terminator
 
+LogFormatter::LogFormatter(std::shared_ptr<LogFormatterConfigParser> configParser)
+    : m_configParser(std::move(configParser))
+{
+}
+
 std::string LogFormatter::getCurrentTime()
 {
     const auto now = std::chrono::system_clock::now();

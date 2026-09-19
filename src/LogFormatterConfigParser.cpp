@@ -57,7 +57,18 @@ bool parseBackendProperty(BackendConfig& current, const std::string& key, const 
 
     if (key == "level")
     {
-        current.level = value;
+        auto convertStringToEnum = [&](const std::string& levelStr) -> LogLevel
+        {
+            try
+            {
+                return LogLevel::_from_string_nocase(levelStr.c_str());
+            }
+            catch (const std::runtime_error&)
+            {
+                throw std::runtime_error("Invalid log level: " + levelStr);
+            }
+        };
+        current.level = convertStringToEnum(value);
         return true;
     }
 
