@@ -57,6 +57,20 @@ public:
     [[nodiscard]] LogLevel getCurrentLevel() const;
 
     /**
+     * @brief Sets the module name for formatted output.
+     *
+     * @param moduleName Module name string.
+     */
+    void setModuleName(const std::string& moduleName);
+
+    /**
+     * @brief Gets the module name.
+     *
+     * @return Module name string.
+     */
+    [[nodiscard]] std::string getModuleName() const;
+
+    /**
      * @brief Adds a log backend to output logs to.
      *
      * @param backend Shared pointer to a log backend instance.

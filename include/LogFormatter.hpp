@@ -7,6 +7,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 #include <vector>
 
@@ -57,6 +58,16 @@ public:
             {
                 parts.push_back(std::string("[") + level._to_string() + "]");
             }
+            if (fields.m_moduleName)
+            {
+                parts.push_back(m_moduleName);
+            }
+            if (fields.m_threadId)
+            {
+                std::ostringstream tidStream;
+                tidStream << std::this_thread::get_id();
+                parts.push_back(tidStream.str());
+            }
             parts.push_back(formatted);
 
             std::ostringstream oss;
@@ -79,6 +90,26 @@ public:
         oss << "[" << level._to_string() << "] " << formatted;
 
         return oss.str();
+    }
+
+    /**
+     * @brief Sets the module name.
+     *
+     * @param moduleName Module name string.
+     */
+    void setModuleName(std::string moduleName)
+    {
+        m_moduleName = std::move(moduleName);
+    }
+
+    /**
+     * @brief Gets the current module name.
+     *
+     * @return Module name string.
+     */
+    [[nodiscard]] const std::string& getModuleName() const
+    {
+        return m_moduleName;
     }
 
     /**
@@ -112,6 +143,7 @@ private:
     static std::string getCurrentTime();
 
     std::shared_ptr<LogFormatterConfigParser> m_configParser;
+    std::string m_moduleName { "NULL" };
 };
 
 } // namespace Helper::Logger

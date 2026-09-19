@@ -157,6 +157,8 @@ LogFormatterConfigParser::LogFormatterConfigParser(const std::string& configFile
     }
 
     m_fields = getFieldsByParsing(configFile);
+    configFile.clear();
+    configFile.seekg(0);
     m_backendConfigs = getBackendConfigsByParsing(configFile);
 
     if (m_backendConfigs.empty())
@@ -230,8 +232,18 @@ LogFormat LogFormatterConfigParser::getFieldsByParsing(std::ifstream& configFile
             continue;
         }
 
-        // check if we met the key not related to fields or separator, stop parsing fields
-        break;
+        if (key == "logging" || key == "format")
+        {
+            inFieldsList = false;
+            continue;
+        }
+
+        if (key == "backends")
+        {
+            break;
+        }
+
+        inFieldsList = false;
     }
 
     return format;
