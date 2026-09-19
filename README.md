@@ -144,6 +144,7 @@ The repository provides a Docker container with all preconfigured dependencies (
 ./scripts/run_dev.sh ./scripts/build_native.sh lint
 ./scripts/run_dev.sh ./scripts/build_native.sh build
 ./scripts/run_dev.sh ./scripts/build_native.sh run
+./scripts/run_dev.sh ./scripts/build_native.sh stress
 ```
 
 ### Running Unit Tests
