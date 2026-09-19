@@ -46,23 +46,24 @@ build() {
 
 run()
 {
-    #TODO: should we run all tests and examples? or only some of them?
-    # find build/test -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' testfile; do
-    #     echo_green "Running $testfile"
-    #     "$testfile"
-    # done
+    if [ -x "build/example/main_logger" ]; then
+        echo_green "Running build/example/main_logger"
+        ./build/example/main_logger
+    fi
 
-    find build/example -maxdepth 1 -type f -executable -print0 | while IFS= read -r -d '' example; do
-        echo_green "Running $example"
-        "$example"
-    done
+    if [ -x "build/test/test_logger" ]; then
+        echo_green "Running build/test/test_logger"
+        ./build/test/test_logger
+    fi
+}
 
-    # if [ -f log.txt ]; then
-    #     echo_green "Contents of log.txt:"
-    #     cat log.txt
-    # else
-    #     echo_red "log.txt not found."
-    # fi
+stress()
+{
+    echo_green "== Run Performance & Stress Tests =="
+    if [ ! -x "build/bench/benchmark_logger" ]; then
+        cmake --build ${BUILD_DIR} --target benchmark_logger -- -j${THREADS}
+    fi
+    ./build/bench/benchmark_logger
 }
 
 parse_options()
@@ -80,6 +81,11 @@ parse_options()
         run)
             run
             ;;
+        stress|bench|benchmark)
+            configure
+            build
+            stress
+            ;;
         build_and_run)
             configure
             build
@@ -90,9 +96,10 @@ parse_options()
             lint
             build
             run
+            stress
             ;;
         *)
-            echo "Usage: $0 { configure | lint | build | run | build_and_run | all }"
+            echo "Usage: $0 { configure | lint | build | run | stress | build_and_run | all }"
             exit 1
             ;;
     esac
