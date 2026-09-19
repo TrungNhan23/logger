@@ -9,8 +9,12 @@
 TEST(LogFormatterTest, GetCurrentTime_ReturnsHHMMSSFormat)
 {
     using namespace Helper::Logger;
-    Logger::getInstance().setCurrentLevel(LogLevel::DEBUG);
-    Logger::getInstance().addBackend(std::make_shared<ConsoleBackend>());
+    // ensure a default logger exists via provider
+    Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
+    auto logger = Helper::Logger::defaultLogger();
+    ASSERT_NE(logger, nullptr);
+    logger->setCurrentLevel(LogLevel::DEBUG);
+    logger->addBackend(std::make_shared<ConsoleBackend>());
 
     std::string testMessage = "Test log message";
 

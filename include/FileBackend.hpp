@@ -4,9 +4,7 @@
 
 #include "ILogBackend.hpp"
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 /**
@@ -63,5 +61,4 @@ private:
     std::ofstream m_fileName;
 };
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

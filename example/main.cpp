@@ -4,6 +4,7 @@
 
 #include "ConsoleBackend.hpp"
 #include "FileBackend.hpp"
+#include "LogProvider.hpp"
 #include "Log.hpp"
 
 // This is a simple example to demonstrate the usage of the Logger class.
@@ -11,66 +12,56 @@
 // filtering works.
 void logMessagesWithLevelsVerbose()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
 
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is {} so this message should be logged", lg->getCurrentLevel()._to_string());
 
     LOG_DEBUG("This is a debug message");
     LOG_INFO("This is an info message");
     LOG_WARNING("This is a warning message");
     LOG_ERROR("This is an error message");
 
-    for (auto i = 0; i < 10; ++i)
+    for (auto i = 0; i < 5; ++i)
     {
-        LOG_DEBUG("Debug message ", i, " times", " with more details");
-        LOG_INFO("Info message ", i, " times", " with more details");
-        LOG_WARNING("Warning message ", i, " times", " with more details");
-        LOG_ERROR("Error message ", i, " times", " with more details");
+        LOG_DEBUG("Debug message {} times with more details", i);
+        LOG_INFO("Info message {} times with more details", i);
+        LOG_WARNING("Warning message {} times with more details", i);
+        LOG_ERROR("Error message {} times with more details", i);
     }
 }
 
 void logMessagesWithLevelsInfo()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::INFO);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::INFO);
 
-    LOG_INFO("Current log level is ", Helper::Logger::Logger::getInstance().getCurrentLevel(), " so this message should be logged");
+    LOG_INFO("Current log level is {} so this message should be logged", lg->getCurrentLevel()._to_string());
 
-    LOG_DEBUG("This is a debug message");
+    LOG_DEBUG("This is a debug message (should not be logged in INFO mode)");
     LOG_INFO("This is an info message");
     LOG_WARNING("This is a warning message");
     LOG_ERROR("This is an error message");
-
-    for (auto i = 0; i < 10; ++i)
-    {
-        LOG_DEBUG("Debug message ", i, " times", " with more details");
-        LOG_INFO("Info message ", i, " times", " with more details");
-        LOG_WARNING("Warning message ", i, " times", " with more details");
-        LOG_ERROR("Error message ", i, " times", " with more details");
-    }
 }
 
-// This function is to test the NONE log level, which should only log ERROR
-// messages.
+// This function is to test the NONE log level, which should only log ERROR messages.
 void logMessagesWithLevelsNone()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::NONE);
-    LOG_DEBUG("This is a debug message");
-    LOG_INFO("This is an info message");
-    LOG_WARNING("This is a warning message");
-    LOG_ERROR("This is an error message");
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::NONE);
 
-    for (auto i = 0; i < 10; ++i)
-    {
-        LOG_DEBUG("Debug message ", i, " times", " with more details");
-        LOG_INFO("Info message ", i, " times", " with more details");
-        LOG_WARNING("Warning message ", i, " times", " with more details");
-        LOG_ERROR("Error message ", i, " times", " with more details");
-    }
+    LOG_DEBUG("This debug message should not be logged");
+    LOG_INFO("This info message should not be logged");
+    LOG_WARNING("This warning message should not be logged");
+    LOG_ERROR("This error message SHOULD be logged");
 }
 
 void testWithMultiThreading()
 {
-    constexpr int THREADS = 8;
+    constexpr int THREADS = 4;
 
     std::vector<std::thread> workers;
 
@@ -79,9 +70,9 @@ void testWithMultiThreading()
         workers.emplace_back(
             []()
             {
-                for (int i = 0; i < 100000; ++i)
+                for (int i = 0; i < 100; ++i)
                 {
-                    LOG_INFO("hello {}", i);
+                    LOG_INFO("Thread worker message: {}", i);
                 }
             });
     }
@@ -94,30 +85,34 @@ void testWithMultiThreading()
 
 void testWithTimeMesurement()
 {
-    Helper::Logger::Logger::getInstance().setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
+    auto lg = Helper::Logger::defaultLogger();
+    if (!lg) return;
+    lg->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
     auto start = std::chrono::steady_clock::now();
 
-    for (int i = 0; i < 100000; ++i)
+    for (int i = 0; i < 1000; ++i)
     {
-        LOG_DEBUG("hello {}", i);
-        // auto s = fmt::format("hello {}", i);
+        LOG_DEBUG("Benchmark message {}", i);
     }
 
     auto end = std::chrono::steady_clock::now();
 
-    std::cout << "Time taken with logging a message: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
-              << " microseconds\n";
+    LOG_DEBUG("Time taken for 1000 messages: {} microseconds", std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    Helper::Logger::Logger::getInstance().addBackend(std::make_shared<Helper::Logger::ConsoleBackend>());
-    Helper::Logger::Logger::getInstance().addBackend(std::make_shared<Helper::Logger::FileBackend>("log_example.log"));
+    std::string configPath = (argc > 1) ? argv[1] : "example/config/LogConfig.yaml";
+    auto logger_ptr = std::make_shared<Helper::Logger::Logger>(configPath);
+    Helper::Logger::setDefaultLogger(logger_ptr);
+
+    LOG_INFO("Example logger initialized from config: {}", configPath);
 
     logMessagesWithLevelsVerbose();
     logMessagesWithLevelsInfo();
     logMessagesWithLevelsNone();
-
+    testWithMultiThreading();
     testWithTimeMesurement();
+
     return 0;
 }

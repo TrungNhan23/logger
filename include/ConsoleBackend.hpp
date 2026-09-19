@@ -4,9 +4,7 @@
 
 #include "ILogBackend.hpp"
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 /**
@@ -56,5 +54,4 @@ public:
      */
     void write(const std::string& formattedMsg) override;
 };
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

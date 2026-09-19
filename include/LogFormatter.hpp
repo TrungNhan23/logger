@@ -1,122 +1,81 @@
-#ifndef LOGGER_INCLUDE_LOGFORMATTER_HPP // NOLINT(llvm-header-guard)
-#define LOGGER_INCLUDE_LOGFORMATTER_HPP
+#pragma once // NOLINT(llvm-header-guard)
 
 #include <array>
 #include <chrono>
 #include <ctime>
+#include <memory>
+#include <optional>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <fmt/format.h>
 
+#include "LogFormatterConfigParser.hpp"
 #include "LogLevel.hpp"
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 constexpr size_t SIZE_OF_BUFFER = 1024; // Buffer size for formatted messages
 
 /**
- * @struct LogFormat
- * @brief Represents a fully formatted log record including metadata.
- *
- * This structure contains all contextual information required
- * to represent a log message after formatting.
- *
- * It is typically produced by a LogFormatter and consumed
- * by a log backend (e.g., console, file, network).
- */
-struct LogFormat
-{
-    /**
-     * @brief Timestamp of the log entry.
-     *
-     * Expected to be pre-formatted as a human-readable string,
-     * e.g., "12:00:00.123".
-     */
-    std::string m_timestamp;
-
-    /**
-     * @brief String representation of the log severity level.
-     *
-     * Example values: "DEBUG", "INFO", "WARN", "ERROR".
-     */
-    std::string m_level;
-
-    /**
-     * @brief Source file where the log was generated.
-     *
-     * Typically provided using the __FILE__ macro.
-     */
-    std::string m_file;
-
-    /**
-     * @brief Line number in the source file.
-     *
-     * Typically provided using the __LINE__ macro.
-     */
-    uint32_t m_line;
-
-    /**
-     * @brief Final formatted log message content.
-     *
-     * Contains the user-provided message after
-     * printf-style formatting (if applicable).
-     */
-    std::string m_message;
-}; // may usde in future for structured logging or log backends
-
-/**
  * @class LogFormatter
- * @brief Singleton class responsible for formatting log messages.
+ * @brief Class responsible for formatting log messages.
  *
  * This class formats log messages into a human-readable string
- * according to predefined formatting rules.
- *
- * Format rule:
- *   file line [optional time] [LEVEL] message
- *
- * Timestamp (HH:MM:SS) is included only for DEBUG and ERROR levels.
- *
- * This class does not manage output destinations.
- * It only handles formatting responsibility.
+ * according to predefined formatting rules or parsed YAML configuration.
  */
 class LogFormatter
 {
 public:
     /**
-     * @brief Formats a log message according to the formatting policy.
-     *
-     * Format structure:
-     *   file line [optional timestamp] [LEVEL] message
-     *
-     * Timestamp (HH:MM:SS) is included only when:
-     *   - level == LOG_LEVEL_DEBUG
-     *   - level == LOG_LEVEL_ERROR
+     * @brief Formats a log message according to the formatting policy or configuration.
      *
      * @param level   Log severity level.
-     * @param file    Source file name (typically from __FILE__ macro).
-     * @param line    Source line number (typically from __LINE__ macro).
-     * @param message User formatted message.
-     *
+     * @param message Format string.
+     * @param args    Formatting arguments.
      * @return Fully formatted log string.
      */
     template<typename... Args>
-    std::string format(LogLevel level, const std::string& file, int line, const std::string& message, Args&&... args)
+    std::string format(LogLevel level, const std::string& message, Args&&... args)
     {
+        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
+
+        if (m_configParser)
+        {
+            const auto& fields = m_configParser->getFields();
+            std::string separator = fields.m_separator.value_or(" ");
+            std::vector<std::string> parts;
+
+            if (fields.m_timestamp)
+            {
+                parts.push_back(getCurrentTime());
+            }
+            if (fields.m_level)
+            {
+                parts.push_back(std::string("[") + level._to_string() + "]");
+            }
+            parts.push_back(formatted);
+
+            std::ostringstream oss;
+            for (size_t i = 0; i < parts.size(); ++i)
+            {
+                if (i > 0)
+                {
+                    oss << separator;
+                }
+                oss << parts[i];
+            }
+            return oss.str();
+        }
+
         std::ostringstream oss;
-
-        oss << file << ":" << line << " ";
-
         if (level._to_integral() == LogLevel::DEBUG || level._to_integral() == LogLevel::ERROR)
         {
             oss << getCurrentTime() << " ";
         }
-
-        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
         oss << "[" << level._to_string() << "] " << formatted;
 
         return oss.str();
@@ -124,27 +83,23 @@ public:
 
     /**
      * @brief Deleted copy constructor.
-     *
-     * Prevents copying of singleton instance.
      */
     LogFormatter(const LogFormatter&) = delete;
 
     /**
      * @brief Deleted copy assignment operator.
-     *
-     * Prevents assignment of singleton instance.
      */
     LogFormatter& operator=(const LogFormatter&) = delete;
     LogFormatter(LogFormatter&&) = delete;
     LogFormatter& operator=(LogFormatter&&) = delete;
 
     /**
-     * @brief Private constructor to enforce singleton pattern.
+     * @brief ctor.
      */
-    LogFormatter() = default;
+    explicit LogFormatter(std::shared_ptr<LogFormatterConfigParser> configParser = nullptr);
 
     /**
-     * @brief Default destructor.
+     * @brief dtor.
      */
     ~LogFormatter() = default;
 
@@ -152,13 +107,11 @@ private:
     /**
      * @brief Returns the current time formatted as HH:MM:SS.
      *
-     * Does not include date information.
-     *
      * @return Current time as string.
      */
     static std::string getCurrentTime();
+
+    std::shared_ptr<LogFormatterConfigParser> m_configParser;
 };
 
-} // namespace Logger
-} // namespace Helper
-#endif // LOGGER_INCLUDE_LOGFORMATTER_HPP
+} // namespace Helper::Logger

@@ -7,36 +7,38 @@
 
 #include "ILogBackend.hpp"
 #include "LogFormatter.hpp"
+#include "LogFormatterConfigParser.hpp"
 #include "LogLevel.hpp"
 
-namespace Helper
-{
-namespace Logger
+namespace Helper::Logger
 {
 
 /**
  * @class Logger
- * @brief Thread-safe singleton logger that outputs formatted logs to console.
+ * @brief Thread-safe logger service that outputs formatted logs to multiple backends.
  *
  * This logger provides:
  * - Log level filtering
  * - printf-style formatted logging
- * - Thread-safe console output
+ * - Thread-safe output to multiple backends (console, file, etc.)
+ * - Configurable formatting via YAML config file
  *
- * Designed as a simple base logger suitable for Linux or desktop environments.
+ * Designed as a service component suitable for Linux or desktop environments.
  * Not intended for ISR or hard real-time environments.
+ *
+ * @note This class should not define as a singleton. Create one instance and manage it via
+ *       dependency injection or a service registry.
  */
 class Logger
 {
 public:
     /**
-     * @brief Returns the singleton instance of Logger.
+     * @brief Constructs a Logger instance with configuration from YAML file.
      *
-     * Thread-safe since C++11.
-     *
-     * @return Reference to the global Logger instance.
+     * @param configFilePath Path to the YAML configuration file containing
+     *                        format and backends configuration.
      */
-    static Logger& getInstance();
+    explicit Logger(std::string configFilePath);
 
     /**
      * @brief Sets the minimum log level.
@@ -48,36 +50,22 @@ public:
     void setCurrentLevel(LogLevel level);
 
     /**
-     * @brief get the current log level.
-     *
-     * Messages below this level will be ignored.
+     * @brief Get the current log level.
      *
      * @return The current log level.
      */
-    LogLevel getCurrentLevel() const;
+    [[nodiscard]] LogLevel getCurrentLevel() const;
 
     /**
      * @brief Adds a log backend to output logs to.
-     *
-     * Each backend implements the ILogBackend interface, allowing for flexible
-     * log output (e.g., console, file,...).
      *
      * @param backend Shared pointer to a log backend instance.
      */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
 
-    /**
-     * @brief Adds a log backend to output logs to.
-     *
-     */
     template<typename... Args>
-    void printMessage(LogLevel level, const std::string& file, int line, const std::string& message, Args&&... args)
+    void printMessage(LogLevel level, const std::string& message, Args&&... args)
     {
-        // For handle log level filtering, we can check the current log level
-        // before formatting the message. Only log all when the verbose level is
-        // set, otherwise log only messages with level equal or higher than the
-        // current log level. If the current log level is NONE, only log ERROR
-        // messages.
         if (m_level._to_integral() == LogLevel::NONE)
         {
             if (level._to_integral() != LogLevel::ERROR)
@@ -85,17 +73,25 @@ public:
                 return;
             }
         }
-        else if (level < m_level)
+        else if (level._to_integral() < m_level._to_integral())
         {
             return;
         }
 
-        auto formattedMessage = m_formatter->format(level, file, line, message, std::forward<Args>(args)...);
+        if (!m_formatter)
+        {
+            return;
+        }
+
+        auto formattedMessage = m_formatter->format(level, message, std::forward<Args>(args)...);
 
         std::lock_guard<std::mutex> lock(m_logMutex);
-        for (const auto& backend : m_logBackends)
+        for (const auto& backendEntry : m_logBackends)
         {
-            backend->write(formattedMessage);
+            if (backendEntry.backend && level._to_integral() >= backendEntry.level._to_integral())
+            {
+                backendEntry.backend->write(formattedMessage);
+            }
         }
     }
 
@@ -105,13 +101,13 @@ public:
     Logger& operator=(Logger&&) = delete;
     ~Logger() = default;
 
-protected:
-    /**
-     * @brief Private constructor to enforce singleton pattern.
-     */
-    Logger();
-
 private:
+    struct BackendEntry
+    {
+        LogLevel level;
+        std::shared_ptr<ILogBackend> backend;
+    };
+
     /**
      * @brief The current log level threshold.
      */
@@ -123,15 +119,30 @@ private:
     std::mutex m_logMutex;
 
     /**
+    * @brief Path to the YAML configuration file.
+    *
+    * Used for reference and potential reloading of configuration at runtime.
+    */
+    std::string m_logConfigFilePath;
+
+    /**
      * @brief List of log backends to output logs to.
      *
      * Each backend implements the ILogBackend interface, allowing for flexible
      * log output (e.g., console, file, network).
      */
-    std::vector<std::shared_ptr<ILogBackend>> m_logBackends;
+    std::vector<BackendEntry> m_logBackends;
 
+    /*
+     * @brief Log formatter instance used to format log messages according to
+     *        the specified formatting policy.
+     */
     std::unique_ptr<LogFormatter> m_formatter;
+
+    /*
+     * @brief Configuration parser for initializing logger settings from a YAML file.
+     */
+    std::shared_ptr<LogFormatterConfigParser> m_loggerConfigParser;
 };
 
-} // namespace Logger
-} // namespace Helper
+} // namespace Helper::Logger

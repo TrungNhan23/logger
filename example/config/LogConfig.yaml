@@ -1,0 +1,17 @@
+logging:
+  format:
+    fields:
+      - timestamp
+      - level
+      - module
+      - message
+    separator: " | "
+  backends:
+    console:
+      enabled: true
+      level: INFO
+    file:
+      enabled: true
+      level: DEBUG
+      path: "../log_example.log"
+      max_backups: 1
