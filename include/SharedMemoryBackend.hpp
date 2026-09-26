@@ -1,5 +1,6 @@
 #pragma once // NOLINT(llvm-header-guard)
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -22,7 +23,7 @@ constexpr uint32_t SHM_VERSION = 1;
 /**
  * @brief Default shared memory buffer size (1 MB).
  */
-constexpr size_t SHM_DEFAULT_BUFFER_SIZE = 1024 * 1024;
+constexpr size_t SHM_DEFAULT_BUFFER_SIZE = 1024ULL * 1024ULL;
 
 /**
  * @brief Default shared memory object name.
@@ -39,14 +40,14 @@ constexpr const char* SHM_DEFAULT_NAME = "/logger_crash_buffer";
  */
 struct SharedMemoryHeader
 {
-    uint32_t magic;          ///< Magic number for validation (SHM_MAGIC)
-    uint32_t version;        ///< Layout version for compatibility checks
-    uint64_t capacity;       ///< Size of the data buffer in bytes
-    uint64_t write_pos;      ///< Current write position in the ring buffer
-    uint64_t total_written;  ///< Total bytes ever written (for wrap detection)
-    uint32_t pid;            ///< PID of the writer process
-    uint8_t wrapped;         ///< Whether the buffer has wrapped around
-    uint8_t padding[23];     ///< Padding to 64 bytes for cache alignment
+    uint32_t magic;                    ///< Magic number for validation (SHM_MAGIC)
+    uint32_t version;                  ///< Layout version for compatibility checks
+    uint64_t capacity;                 ///< Size of the data buffer in bytes
+    uint64_t write_pos;                ///< Current write position in the ring buffer
+    uint64_t total_written;            ///< Total bytes ever written (for wrap detection)
+    uint32_t pid;                      ///< PID of the writer process
+    uint8_t wrapped;                   ///< Whether the buffer has wrapped around
+    std::array<uint8_t, 27> padding;   ///< Padding to 64 bytes for cache alignment
 };
 
 static_assert(sizeof(SharedMemoryHeader) == 64, "SharedMemoryHeader must be 64 bytes");

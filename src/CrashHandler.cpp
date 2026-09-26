@@ -22,6 +22,8 @@ namespace
 
 constexpr int MAX_STACK_FRAMES = 64;
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
+
 /**
  * @brief Async-signal-safe write helper.
  *
@@ -86,6 +88,8 @@ void intToStr(int value, char* buffer)
     }
     buffer[pos] = '\0';
 }
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
 
 /**
  * @brief Returns a human-readable name for a signal number.

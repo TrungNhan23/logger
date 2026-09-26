@@ -17,13 +17,14 @@ namespace Helper::Logger
 
 #ifdef __linux__
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
+
 SharedMemoryBackend::SharedMemoryBackend(const std::string& shmName, size_t bufferSize)
-    : m_totalSize(sizeof(SharedMemoryHeader) + bufferSize)
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
+    : m_shmFd(shm_open(shmName.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR))
+    , m_totalSize(sizeof(SharedMemoryHeader) + bufferSize)
     , m_shmName(shmName)
 {
-    // Create or open the shared memory object
-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-    m_shmFd = shm_open(shmName.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
     if (m_shmFd == -1)
     {
         throw std::runtime_error(
@@ -196,6 +197,8 @@ void SharedMemoryBackend::clearLogs(const std::string& shmName)
 {
     shm_unlink(shmName.c_str());
 }
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-bounds-constant-array-index)
 
 #else
 

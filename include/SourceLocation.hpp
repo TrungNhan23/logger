@@ -3,6 +3,8 @@
 namespace Helper::Logger
 {
 
+// NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+
 /**
  * @struct SourceLocation
  * @brief Captures the source location of a log call site.
@@ -67,5 +69,7 @@ struct SourceLocation
         return extractBasename(file);
     }
 };
+
+// NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
 
 } // namespace Helper::Logger
