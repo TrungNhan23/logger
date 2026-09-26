@@ -74,6 +74,15 @@ public:
      *       and thread-safe if the logger supports multi-threading.
      */
     virtual void write(const std::string& formattedMsg) = 0;
+
+    /**
+     * @brief Flushes any buffered output to the backend destination.
+     *
+     * Called by the logger during crash handling or shutdown to ensure
+     * all pending data is written. Default implementation is a no-op.
+     * Backends with internal buffering (e.g., FileBackend) should override.
+     */
+    virtual void flush() {}
 };
 
 } // namespace Helper::Logger

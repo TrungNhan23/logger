@@ -2,8 +2,11 @@ logging:
   format:
     fields:
       - timestamp
-      - module
+      - file
+      - function
+      - line
       - level
+      - module
       - message
     separator: " | "
   backends:

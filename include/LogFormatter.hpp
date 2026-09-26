@@ -15,6 +15,7 @@
 
 #include "LogFormatterConfigParser.hpp"
 #include "LogLevel.hpp"
+#include "SourceLocation.hpp"
 
 namespace Helper::Logger
 {
@@ -27,12 +28,33 @@ constexpr size_t SIZE_OF_BUFFER = 1024; // Buffer size for formatted messages
  *
  * This class formats log messages into a human-readable string
  * according to predefined formatting rules or parsed YAML configuration.
+ *
+ * When a LogFormatterConfigParser is provided, the formatter iterates
+ * through the ordered field list (m_fieldOrder) to produce output in
+ * exactly the sequence specified by the YAML configuration.
  */
 class LogFormatter
 {
 public:
     /**
      * @brief Formats a log message according to the formatting policy or configuration.
+     *
+     * @param level   Log severity level.
+     * @param loc     Source location of the log call site.
+     * @param message Format string.
+     * @param args    Formatting arguments.
+     * @return Fully formatted log string.
+     */
+    template<typename... Args>
+    std::string format(LogLevel level, const SourceLocation& loc,
+                       const std::string& message, Args&&... args)
+    {
+        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
+        return formatMessage(level, loc, formatted);
+    }
+
+    /**
+     * @brief Formats a log message without source location (backward compatibility).
      *
      * @param level   Log severity level.
      * @param message Format string.
@@ -42,54 +64,7 @@ public:
     template<typename... Args>
     std::string format(LogLevel level, const std::string& message, Args&&... args)
     {
-        std::string formatted = fmt::format(message, std::forward<Args>(args)...);
-
-        if (m_configParser)
-        {
-            const auto& fields = m_configParser->getFields();
-            std::string separator = fields.m_separator.value_or(" ");
-            std::vector<std::string> parts;
-
-            if (fields.m_timestamp)
-            {
-                parts.push_back(getCurrentTime());
-            }
-            if (fields.m_level)
-            {
-                parts.push_back(std::string("[") + level._to_string() + "]");
-            }
-            if (fields.m_moduleName)
-            {
-                parts.push_back(m_moduleName);
-            }
-            if (fields.m_threadId)
-            {
-                std::ostringstream tidStream;
-                tidStream << std::this_thread::get_id();
-                parts.push_back(tidStream.str());
-            }
-            parts.push_back(formatted);
-
-            std::ostringstream oss;
-            for (size_t i = 0; i < parts.size(); ++i)
-            {
-                if (i > 0)
-                {
-                    oss << separator;
-                }
-                oss << parts[i];
-            }
-            return oss.str();
-        }
-
-        std::ostringstream oss;
-        if (level._to_integral() == LogLevel::DEBUG || level._to_integral() == LogLevel::ERROR)
-        {
-            oss << getCurrentTime() << " ";
-        }
-        oss << "[" << level._to_string() << "] " << formatted;
-
-        return oss.str();
+        return format(level, SourceLocation{}, message, std::forward<Args>(args)...);
     }
 
     /**
@@ -135,6 +110,21 @@ public:
     ~LogFormatter() = default;
 
 private:
+    /**
+     * @brief Formats the assembled log message string.
+     */
+    [[nodiscard]] std::string formatMessage(LogLevel level, const SourceLocation& loc,
+                                            const std::string& formatted) const;
+
+    [[nodiscard]] std::string formatWithConfig(LogLevel level, const SourceLocation& loc,
+                                               const std::string& formatted) const;
+
+    [[nodiscard]] static std::string formatFallback(LogLevel level, const std::string& formatted);
+
+    void appendField(std::vector<std::string>& parts, FieldType field,
+                     LogLevel level, const SourceLocation& loc,
+                     const std::string& formatted, bool& messageAdded) const;
+
     /**
      * @brief Returns the current time formatted as HH:MM:SS.
      *

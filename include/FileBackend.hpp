@@ -54,6 +54,14 @@ public:
      */
     void write(const std::string& formattedMessage) override;
 
+    /**
+     * @brief Flushes buffered file output to disk.
+     *
+     * Ensures all pending data is written to the underlying file,
+     * important during crash handling to preserve log data.
+     */
+    void flush() override;
+
 private:
     /**
      * @brief Output file stream used for writing log messages.

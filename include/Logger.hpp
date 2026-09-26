@@ -9,6 +9,7 @@
 #include "LogFormatter.hpp"
 #include "LogFormatterConfigParser.hpp"
 #include "LogLevel.hpp"
+#include "SourceLocation.hpp"
 
 namespace Helper::Logger
 {
@@ -77,8 +78,17 @@ public:
      */
     void addBackend(const std::shared_ptr<ILogBackend>& backend);
 
+    /**
+     * @brief Logs a message with source location information.
+     *
+     * @param level   Log severity level.
+     * @param loc     Source location of the call site.
+     * @param message Format string.
+     * @param args    Formatting arguments.
+     */
     template<typename... Args>
-    void printMessage(LogLevel level, const std::string& message, Args&&... args)
+    void printMessage(LogLevel level, const SourceLocation& loc,
+                      const std::string& message, Args&&... args)
     {
         if (m_level._to_integral() == LogLevel::NONE)
         {
@@ -97,7 +107,8 @@ public:
             return;
         }
 
-        auto formattedMessage = m_formatter->format(level, message, std::forward<Args>(args)...);
+        auto formattedMessage = m_formatter->format(level, loc, message,
+                                                     std::forward<Args>(args)...);
 
         std::lock_guard<std::mutex> lock(m_logMutex);
         for (const auto& backendEntry : m_logBackends)
@@ -108,6 +119,28 @@ public:
             }
         }
     }
+
+    /**
+     * @brief Logs a message without source location (backward compatibility).
+     *
+     * @param level   Log severity level.
+     * @param message Format string.
+     * @param args    Formatting arguments.
+     */
+    template<typename... Args>
+    void printMessage(LogLevel level, const std::string& message, Args&&... args)
+    {
+        printMessage(level, SourceLocation{}, message, std::forward<Args>(args)...);
+    }
+
+    /**
+     * @brief Flushes all registered backends.
+     *
+     * Acquires the log mutex and calls flush() on each backend.
+     * Used by the crash handler to ensure all pending output is written
+     * before process termination.
+     */
+    void flushAll();
 
     Logger(const Logger&) = delete;
     Logger& operator=(const Logger&) = delete;

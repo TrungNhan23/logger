@@ -21,4 +21,12 @@ void FileBackend::write(const std::string& formattedMessage)
     }
 }
 
+void FileBackend::flush()
+{
+    if (m_fileName.is_open())
+    {
+        m_fileName.flush();
+    }
+}
+
 } // namespace Helper::Logger
