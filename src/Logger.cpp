@@ -87,4 +87,16 @@ void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
     }
 }
 
+void Logger::flushAll()
+{
+    std::lock_guard<std::mutex> lock(m_logMutex);
+    for (auto& backendEntry : m_logBackends)
+    {
+        if (backendEntry.backend)
+        {
+            backendEntry.backend->flush();
+        }
+    }
+}
+
 } // namespace Helper::Logger

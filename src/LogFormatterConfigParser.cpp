@@ -13,15 +13,17 @@ namespace Helper::Logger
 
 namespace
 {
-void setFieldByName(LogFormat& format, const std::string& field)
+void addFieldByName(LogFormat& format, const std::string& field)
 {
-    if (field == "timestamp") { format.m_timestamp = true; return; }
-    if (field == "level") { format.m_level = true; return; }
-    if (field == "file") { format.m_file = true; return; }
-    if (field == "line") { format.m_line = true; return; }
-    if (field == "module") { format.m_moduleName = true; return; }
-    if (field == "thread_id") { format.m_threadId = true; return; }
-    // "message" is mandatory and implicitly present
+    if (field == "timestamp") { format.m_fieldOrder.push_back(FieldType::Timestamp); return; }
+    if (field == "level") { format.m_fieldOrder.push_back(FieldType::Level); return; }
+    if (field == "file") { format.m_fieldOrder.push_back(FieldType::File); return; }
+    if (field == "line") { format.m_fieldOrder.push_back(FieldType::Line); return; }
+    if (field == "function") { format.m_fieldOrder.push_back(FieldType::Function); return; }
+    if (field == "module") { format.m_fieldOrder.push_back(FieldType::Module); return; }
+    if (field == "thread_id") { format.m_fieldOrder.push_back(FieldType::ThreadId); return; }
+    // "message" is mandatory and implicitly present, but can be explicitly positioned
+    if (field == "message") { format.m_fieldOrder.push_back(FieldType::Message); return; }
 }
 
 bool tryInitBackendFromKey(const std::string& key, BackendConfig& out)
@@ -205,7 +207,7 @@ LogFormat LogFormatterConfigParser::getFieldsByParsing(std::ifstream& configFile
             }
 
             std::string field = removeQuotes(trim(content.substr(1)));
-            setFieldByName(format, field);
+            addFieldByName(format, field);
 
             continue;
         }
