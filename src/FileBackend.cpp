@@ -17,7 +17,7 @@ void FileBackend::write(const std::string& formattedMessage)
 {
     if (m_fileName.is_open())
     {
-        m_fileName << formattedMessage << std::endl;
+        m_fileName << formattedMessage << '\n';
     }
 }
 

@@ -183,23 +183,35 @@ BenchmarkResult benchmarkMultiThreaded(int threadCount, size_t msgsPerThread = 2
     std::vector<std::thread> workers;
     std::atomic<bool> startSignal { false };
 
-    auto start = std::chrono::high_resolution_clock::now();
+    const size_t samplesPerThread = std::max<size_t>(100, 10000 / static_cast<size_t>(threadCount));
+    std::vector<std::vector<double>> threadSamples(threadCount);
 
     for (int t = 0; t < threadCount; ++t)
     {
-        workers.emplace_back([&startSignal, msgsPerThread, t]() {
+        threadSamples[t].reserve(samplesPerThread);
+        workers.emplace_back([&startSignal, &threadSamples, msgsPerThread, samplesPerThread, t]() {
             while (!startSignal.load(std::memory_order_relaxed))
             {
                 std::this_thread::yield();
             }
             for (size_t i = 0; i < msgsPerThread; ++i)
             {
-                LOG_INFO("Worker thread {} event index {} status {}", t, i, "ACTIVE");
+                if (i < samplesPerThread)
+                {
+                    auto t0 = std::chrono::high_resolution_clock::now();
+                    LOG_INFO("Worker thread {} event index {} status {}", t, i, "ACTIVE");
+                    auto t1 = std::chrono::high_resolution_clock::now();
+                    threadSamples[t].push_back(std::chrono::duration<double, std::nano>(t1 - t0).count());
+                }
+                else
+                {
+                    LOG_INFO("Worker thread {} event index {} status {}", t, i, "ACTIVE");
+                }
             }
         });
     }
 
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     startSignal.store(true, std::memory_order_release);
 
     for (auto& w : workers)
@@ -212,18 +224,32 @@ BenchmarkResult benchmarkMultiThreaded(int threadCount, size_t msgsPerThread = 2
     double throughput = static_cast<double>(totalMessages) / totalTimeSec;
     double avgLatencyNs = (totalTimeSec * 1e9) / static_cast<double>(totalMessages);
 
+    std::vector<double> allLatencies;
+    for (const auto& ts : threadSamples)
+    {
+        allLatencies.insert(allLatencies.end(), ts.begin(), ts.end());
+    }
+    std::sort(allLatencies.begin(), allLatencies.end());
+    size_t totalSamples = allLatencies.size();
+    double p50 = totalSamples > 0 ? allLatencies[static_cast<size_t>(totalSamples * 0.50)] : avgLatencyNs;
+    double p90 = totalSamples > 0 ? allLatencies[static_cast<size_t>(totalSamples * 0.90)] : avgLatencyNs;
+    double p95 = totalSamples > 0 ? allLatencies[static_cast<size_t>(totalSamples * 0.95)] : avgLatencyNs;
+    double p99 = totalSamples > 0 ? allLatencies[static_cast<size_t>(totalSamples * 0.99)] : avgLatencyNs;
+    double p999 = totalSamples > 0 ? allLatencies[static_cast<size_t>(totalSamples * 0.999)] : avgLatencyNs;
+    double maxLat = totalSamples > 0 ? allLatencies.back() : avgLatencyNs;
+
     return BenchmarkResult{
         "3. Multi-Thread (" + std::to_string(threadCount) + " Threads)",
         totalMessages,
         totalTimeSec,
         throughput,
         avgLatencyNs,
-        avgLatencyNs,
-        avgLatencyNs * 1.5,
-        avgLatencyNs * 2.0,
-        avgLatencyNs * 3.5,
-        avgLatencyNs * 5.0,
-        avgLatencyNs * 10.0
+        p50,
+        p90,
+        p95,
+        p99,
+        p999,
+        maxLat
     };
 }
 
@@ -237,16 +263,38 @@ BenchmarkResult benchmarkFileBackend(size_t iterations = 200000)
     logger->addBackend(std::make_shared<Helper::Logger::FileBackend>(filename));
     Helper::Logger::setDefaultLogger(logger);
 
+    const size_t sampleCount = 20000;
+    std::vector<double> latencies;
+    latencies.reserve(sampleCount);
+
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t i = 0; i < iterations; ++i)
     {
-        LOG_INFO("Writing record to file index {} payload data ABCDEFGHIJKLMNOPQRSTUVWXYZ", i);
+        if (i < sampleCount)
+        {
+            auto t0 = std::chrono::high_resolution_clock::now();
+            LOG_INFO("Writing record to file index {} payload data ABCDEFGHIJKLMNOPQRSTUVWXYZ", i);
+            auto t1 = std::chrono::high_resolution_clock::now();
+            latencies.push_back(std::chrono::duration<double, std::nano>(t1 - t0).count());
+        }
+        else
+        {
+            LOG_INFO("Writing record to file index {} payload data ABCDEFGHIJKLMNOPQRSTUVWXYZ", i);
+        }
     }
     auto end = std::chrono::high_resolution_clock::now();
 
     double totalTimeSec = std::chrono::duration<double>(end - start).count();
     double throughput = static_cast<double>(iterations) / totalTimeSec;
     double avgLatencyNs = (totalTimeSec * 1e9) / static_cast<double>(iterations);
+
+    std::sort(latencies.begin(), latencies.end());
+    double p50 = latencies[static_cast<size_t>(sampleCount * 0.50)];
+    double p90 = latencies[static_cast<size_t>(sampleCount * 0.90)];
+    double p95 = latencies[static_cast<size_t>(sampleCount * 0.95)];
+    double p99 = latencies[static_cast<size_t>(sampleCount * 0.99)];
+    double p999 = latencies[static_cast<size_t>(sampleCount * 0.999)];
+    double maxLat = latencies.back();
 
     std::remove(filename.c_str());
 
@@ -256,12 +304,12 @@ BenchmarkResult benchmarkFileBackend(size_t iterations = 200000)
         totalTimeSec,
         throughput,
         avgLatencyNs,
-        avgLatencyNs,
-        avgLatencyNs * 1.2,
-        avgLatencyNs * 1.5,
-        avgLatencyNs * 3.0,
-        avgLatencyNs * 4.0,
-        avgLatencyNs * 8.0
+        p50,
+        p90,
+        p95,
+        p99,
+        p999,
+        maxLat
     };
 }
 

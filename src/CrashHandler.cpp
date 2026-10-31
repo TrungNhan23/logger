@@ -120,7 +120,7 @@ void CrashHandler::install()
     struct sigaction sa{};
     sa.sa_handler = signalHandler;
     sigemptyset(&sa.sa_mask);
-    sa.sa_flags = SA_RESETHAND; // One-shot: reset to default after first catch
+    sa.sa_flags = SA_RESETHAND;
 
     constexpr std::array<int, 5> signals = { SIGSEGV, SIGABRT, SIGBUS, SIGFPE, SIGILL };
     for (int sig : signals)
@@ -131,7 +131,6 @@ void CrashHandler::install()
 
 void CrashHandler::signalHandler(int signum)
 {
-    // All output uses write() which is async-signal-safe
     safeWrite(STDERR_FILENO, "\n");
     safeWrite(STDERR_FILENO, "========================================\n");
     safeWrite(STDERR_FILENO, "=== FATAL SIGNAL RECEIVED ===\n");
@@ -146,13 +145,11 @@ void CrashHandler::signalHandler(int signum)
     safeWrite(STDERR_FILENO, ")\n");
 
 #ifdef __linux__
-    // Capture stack trace
     safeWrite(STDERR_FILENO, "\n--- Stack Trace ---\n");
 
     std::array<void*, MAX_STACK_FRAMES> frames{};
     int depth = backtrace(frames.data(), MAX_STACK_FRAMES);
 
-    // backtrace_symbols_fd is the async-signal-safe variant
     backtrace_symbols_fd(frames.data(), depth, STDERR_FILENO);
 
     safeWrite(STDERR_FILENO, "--- End Stack Trace ---\n\n");

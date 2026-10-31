@@ -53,12 +53,12 @@ Logger::Logger(std::string configFilePath)
 
 void Logger::setCurrentLevel(LogLevel level)
 {
-    m_level = level;
+    m_level.store(level, std::memory_order_relaxed);
 }
 
 LogLevel Logger::getCurrentLevel() const
 {
-    return m_level;
+    return m_level.load(std::memory_order_relaxed);
 }
 
 void Logger::setModuleName(const std::string& moduleName)

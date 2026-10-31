@@ -12,7 +12,16 @@ echo_red ()
 
 echo_green ()
 {
-    echo -e "\033[32m$1\033[0m"
+    echo -e "\033[38;2;0;255;0m$1\033[0m"
+}
+
+colorize_output ()
+{
+    sed -u \
+        -e 's/\x1b\[32m/\x1b[38;2;0;255;0m/g' \
+        -e 's/\x1b\[0;32m/\x1b[38;2;0;255;0m/g' \
+        -e 's/\x1b\[1;32m/\x1b[1;38;2;0;255;0m/g' \
+        -e '/\x1b\[38;2;0;255;0m/!s/.*Building C.* object.*/\x1b[38;2;0;255;0m&\x1b[0m/'
 }
 
 ensure_in_docker()
@@ -27,7 +36,7 @@ ensure_in_docker()
 
 configure() {
     echo_green "== Configure CMake =="
-    cmake -S . -B ${BUILD_DIR} \
+    cmake -S . -B "${BUILD_DIR}" \
           -DENABLE_LINT=ON \
           -DENABLE_COVERAGE=ON \
           -DCMAKE_BUILD_TYPE=Debug \
@@ -41,7 +50,7 @@ lint() {
 
 build() {
     echo_green "== Build Project =="
-    cmake --build ${BUILD_DIR} -- -j${THREADS}
+    CLICOLOR_FORCE=1 cmake --build "${BUILD_DIR}" -- -j"${THREADS}" 2>&1 | colorize_output
 }
 
 run()
@@ -61,7 +70,7 @@ stress()
 {
     echo_green "== Run Performance & Stress Tests =="
     if [ ! -x "build/bench/benchmark_logger" ]; then
-        cmake --build ${BUILD_DIR} --target benchmark_logger -- -j${THREADS}
+        CLICOLOR_FORCE=1 cmake --build "${BUILD_DIR}" --target benchmark_logger -- -j"${THREADS}" 2>&1 | colorize_output
     fi
     ./build/bench/benchmark_logger
 }

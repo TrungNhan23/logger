@@ -1,5 +1,7 @@
 #pragma once // NOLINT(llvm-header-guard)
 
+#include <atomic>
+#include <cstdlib>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -90,14 +92,15 @@ public:
     void printMessage(LogLevel level, const SourceLocation& loc,
                       const std::string& message, Args&&... args)
     {
-        if (m_level._to_integral() == LogLevel::NONE)
+        const LogLevel currentLevel = m_level.load(std::memory_order_relaxed);
+        if (currentLevel._to_integral() == LogLevel::NONE)
         {
             if (level._to_integral() != LogLevel::ERROR)
             {
                 return;
             }
         }
-        else if (level._to_integral() < m_level._to_integral())
+        else if (level._to_integral() < currentLevel._to_integral())
         {
             return;
         }
@@ -158,7 +161,7 @@ private:
     /**
      * @brief The current log level threshold.
      */
-    LogLevel m_level;
+    std::atomic<LogLevel> m_level { LogLevel::INFO };
 
     /**
      * @brief Mutex to ensure thread-safe logging.

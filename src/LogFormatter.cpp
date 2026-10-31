@@ -120,6 +120,14 @@ std::string LogFormatter::getCurrentTime()
     const auto now = std::chrono::system_clock::now();
     const std::time_t TIME_NOW = std::chrono::system_clock::to_time_t(now);
 
+    thread_local std::time_t lastSecond = 0;
+    thread_local std::string lastFormattedTime;
+
+    if (TIME_NOW == lastSecond && !lastFormattedTime.empty())
+    {
+        return lastFormattedTime;
+    }
+
     std::tm localTime {};
 #if defined(_WIN32)
     localtime_s(&localTime, &TIME_NOW);
@@ -131,7 +139,10 @@ std::string LogFormatter::getCurrentTime()
 
     const std::size_t written = std::strftime(buffer.data(), buffer.size(), "%H:%M:%S", &localTime);
 
-    return { buffer.data(), written };
+    lastSecond = TIME_NOW;
+    lastFormattedTime.assign(buffer.data(), written);
+
+    return lastFormattedTime;
 }
 
 } // namespace Helper::Logger

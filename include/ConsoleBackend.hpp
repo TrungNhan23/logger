@@ -53,5 +53,11 @@ public:
      * @param formattedMsg The fully formatted log message.
      */
     void write(const std::string& formattedMsg) override;
+
+    /**
+     * @brief flush()
+     *
+     */
+    void flush() override;
 };
 } // namespace Helper::Logger
