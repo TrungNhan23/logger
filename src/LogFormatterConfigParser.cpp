@@ -15,24 +15,59 @@ namespace
 {
 void addFieldByName(LogFormat& format, const std::string& field)
 {
-    if (field == "timestamp") { format.m_fieldOrder.push_back(FieldType::Timestamp); return; }
-    if (field == "level") { format.m_fieldOrder.push_back(FieldType::Level); return; }
-    if (field == "file") { format.m_fieldOrder.push_back(FieldType::File); return; }
-    if (field == "line") { format.m_fieldOrder.push_back(FieldType::Line); return; }
-    if (field == "function") { format.m_fieldOrder.push_back(FieldType::Function); return; }
-    if (field == "module") { format.m_fieldOrder.push_back(FieldType::Module); return; }
-    if (field == "thread_id") { format.m_fieldOrder.push_back(FieldType::ThreadId); return; }
+    if (field == "timestamp")
+    {
+        format.m_fieldOrder.push_back(FieldType::Timestamp);
+        return;
+    }
+    if (field == "level")
+    {
+        format.m_fieldOrder.push_back(FieldType::Level);
+        return;
+    }
+    if (field == "file")
+    {
+        format.m_fieldOrder.push_back(FieldType::File);
+        return;
+    }
+    if (field == "line")
+    {
+        format.m_fieldOrder.push_back(FieldType::Line);
+        return;
+    }
+    if (field == "function")
+    {
+        format.m_fieldOrder.push_back(FieldType::Function);
+        return;
+    }
+    if (field == "module")
+    {
+        format.m_fieldOrder.push_back(FieldType::Module);
+        return;
+    }
+    if (field == "thread_id")
+    {
+        format.m_fieldOrder.push_back(FieldType::ThreadId);
+        return;
+    }
     // "message" is mandatory and implicitly present, but can be explicitly positioned
-    if (field == "message") { format.m_fieldOrder.push_back(FieldType::Message); return; }
+    if (field == "message")
+    {
+        format.m_fieldOrder.push_back(FieldType::Message);
+        return;
+    }
 }
 
 bool tryInitBackendFromKey(const std::string& key, BackendConfig& out)
 {
     try
     {
-        out = BackendConfig{};
+        out = BackendConfig {};
         out.name = BackendType::_from_string_nocase(key.c_str());
-        if (out.name == +BackendType::FILE) { out.max_backups = 1; }
+        if (out.name == +BackendType::FILE)
+        {
+            out.max_backups = 1;
+        }
         return true;
     }
     catch (const std::runtime_error&)
@@ -105,8 +140,14 @@ bool tryEnterBackendsSection(bool& inBackendsSection, int& backendsParentIndent,
     return false;
 }
 
-bool tryHandleSectionExit(std::ifstream& configFile, std::streampos linePos, bool inBackendsSection, int indent, int backendsParentIndent,
-                          std::vector<BackendConfig>& backends, BackendConfig& current, bool& hasCurrent)
+bool tryHandleSectionExit(std::ifstream& configFile,
+                          std::streampos linePos,
+                          bool inBackendsSection,
+                          int indent,
+                          int backendsParentIndent,
+                          std::vector<BackendConfig>& backends,
+                          BackendConfig& current,
+                          bool& hasCurrent)
 {
     if (inBackendsSection && indent <= backendsParentIndent)
     {
@@ -120,9 +161,14 @@ bool tryHandleSectionExit(std::ifstream& configFile, std::streampos linePos, boo
     return false;
 }
 
-bool tryHandleBackendNameLine(std::vector<BackendConfig>& backends, BackendConfig& current, bool& hasCurrent,
-                              int indent, int backendsParentIndent, int& currentBackendIndent,
-                              const std::string& key, bool isNameLine)
+bool tryHandleBackendNameLine(std::vector<BackendConfig>& backends,
+                              BackendConfig& current,
+                              bool& hasCurrent,
+                              int indent,
+                              int backendsParentIndent,
+                              int& currentBackendIndent,
+                              const std::string& key,
+                              bool isNameLine)
 {
     if (isNameLine && indent > backendsParentIndent)
     {
@@ -137,8 +183,12 @@ bool tryHandleBackendNameLine(std::vector<BackendConfig>& backends, BackendConfi
     return false;
 }
 
-bool tryHandlePropertyLine(BackendConfig& current, bool hasCurrent, int indent, int currentBackendIndent,
-                           const std::string& key, const std::string& value)
+bool tryHandlePropertyLine(BackendConfig& current,
+                           bool hasCurrent,
+                           int indent,
+                           int currentBackendIndent,
+                           const std::string& key,
+                           const std::string& value)
 {
     if (!hasCurrent || indent <= currentBackendIndent)
     {

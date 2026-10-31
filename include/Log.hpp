@@ -43,10 +43,13 @@
  * @endcode
  */
 #define LOG_DEBUG(fmt, ...) \
-    do { auto lg = Helper::Logger::defaultLogger(); \
-         if (lg) lg->printMessage(Helper::Logger::LogLevel::DEBUG, \
-             Helper::Logger::SourceLocation{__FILE__, __LINE__, __func__}, \
-             fmt, ##__VA_ARGS__); } while (0)
+    do \
+    { \
+        auto lg = Helper::Logger::defaultLogger(); \
+        if (lg) \
+            lg->printMessage( \
+                Helper::Logger::LogLevel::DEBUG, Helper::Logger::SourceLocation { __FILE__, __LINE__, __func__ }, fmt, ##__VA_ARGS__); \
+    } while (0)
 
 /**
  * @def LOG_INFO(fmt, ...)
@@ -65,10 +68,13 @@
  * @endcode
  */
 #define LOG_INFO(fmt, ...) \
-    do { auto lg = Helper::Logger::defaultLogger(); \
-         if (lg) lg->printMessage(Helper::Logger::LogLevel::INFO, \
-             Helper::Logger::SourceLocation{__FILE__, __LINE__, __func__}, \
-             fmt, ##__VA_ARGS__); } while (0)
+    do \
+    { \
+        auto lg = Helper::Logger::defaultLogger(); \
+        if (lg) \
+            lg->printMessage( \
+                Helper::Logger::LogLevel::INFO, Helper::Logger::SourceLocation { __FILE__, __LINE__, __func__ }, fmt, ##__VA_ARGS__); \
+    } while (0)
 
 /**
  * @def LOG_WARNING(fmt, ...)
@@ -87,10 +93,13 @@
  * @endcode
  */
 #define LOG_WARNING(fmt, ...) \
-    do { auto lg = Helper::Logger::defaultLogger(); \
-         if (lg) lg->printMessage(Helper::Logger::LogLevel::WARNING, \
-             Helper::Logger::SourceLocation{__FILE__, __LINE__, __func__}, \
-             fmt, ##__VA_ARGS__); } while (0)
+    do \
+    { \
+        auto lg = Helper::Logger::defaultLogger(); \
+        if (lg) \
+            lg->printMessage( \
+                Helper::Logger::LogLevel::WARNING, Helper::Logger::SourceLocation { __FILE__, __LINE__, __func__ }, fmt, ##__VA_ARGS__); \
+    } while (0)
 
 /**
  * @def LOG_ERROR(fmt, ...)
@@ -112,10 +121,13 @@
  * @endcode
  */
 #define LOG_ERROR(fmt, ...) \
-    do { auto lg = Helper::Logger::defaultLogger(); \
-         if (lg) lg->printMessage(Helper::Logger::LogLevel::ERROR, \
-             Helper::Logger::SourceLocation{__FILE__, __LINE__, __func__}, \
-             fmt, ##__VA_ARGS__); } while (0)
+    do \
+    { \
+        auto lg = Helper::Logger::defaultLogger(); \
+        if (lg) \
+            lg->printMessage( \
+                Helper::Logger::LogLevel::ERROR, Helper::Logger::SourceLocation { __FILE__, __LINE__, __func__ }, fmt, ##__VA_ARGS__); \
+    } while (0)
 
 /**
  * @def LOG_ASSERTION(condition, fmt, ...)
@@ -143,15 +155,21 @@
  * @endcode
  */
 #define LOG_ASSERTION(condition, fmt, ...) \
-    do { if (!(condition)) { \
-        auto lg = Helper::Logger::defaultLogger(); \
-        if (lg) { \
-            lg->printMessage(Helper::Logger::LogLevel::ERROR, \
-                Helper::Logger::SourceLocation{__FILE__, __LINE__, __func__}, \
-                "ASSERTION FAILED [" #condition "]: " fmt, ##__VA_ARGS__); \
-            lg->flushAll(); \
+    do \
+    { \
+        if (!(condition)) \
+        { \
+            auto lg = Helper::Logger::defaultLogger(); \
+            if (lg) \
+            { \
+                lg->printMessage(Helper::Logger::LogLevel::ERROR, \
+                                 Helper::Logger::SourceLocation { __FILE__, __LINE__, __func__ }, \
+                                 "ASSERTION FAILED [" #condition "]: " fmt, \
+                                 ##__VA_ARGS__); \
+                lg->flushAll(); \
+            } \
+            std::abort(); \
         } \
-        std::abort(); \
-    } } while (0)
+    } while (0)
 
 // NOLINTEND(cppcoreguidelines-macro-usage)

@@ -89,8 +89,7 @@ public:
      * @param args    Formatting arguments.
      */
     template<typename... Args>
-    void printMessage(LogLevel level, const SourceLocation& loc,
-                      const std::string& message, Args&&... args)
+    void printMessage(LogLevel level, const SourceLocation& loc, const std::string& message, Args&&... args)
     {
         const LogLevel currentLevel = m_level.load(std::memory_order_relaxed);
         if (currentLevel._to_integral() == LogLevel::NONE)
@@ -110,8 +109,7 @@ public:
             return;
         }
 
-        auto formattedMessage = m_formatter->format(level, loc, message,
-                                                     std::forward<Args>(args)...);
+        auto formattedMessage = m_formatter->format(level, loc, message, std::forward<Args>(args)...);
 
         std::lock_guard<std::mutex> lock(m_logMutex);
         for (const auto& backendEntry : m_logBackends)
@@ -133,7 +131,7 @@ public:
     template<typename... Args>
     void printMessage(LogLevel level, const std::string& message, Args&&... args)
     {
-        printMessage(level, SourceLocation{}, message, std::forward<Args>(args)...);
+        printMessage(level, SourceLocation {}, message, std::forward<Args>(args)...);
     }
 
     /**

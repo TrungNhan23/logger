@@ -46,8 +46,7 @@ public:
      * @return Fully formatted log string.
      */
     template<typename... Args>
-    std::string format(LogLevel level, const SourceLocation& loc,
-                       const std::string& message, Args&&... args)
+    std::string format(LogLevel level, const SourceLocation& loc, const std::string& message, Args&&... args)
     {
         std::string formatted = fmt::format(message, std::forward<Args>(args)...);
         return formatMessage(level, loc, formatted);
@@ -64,7 +63,7 @@ public:
     template<typename... Args>
     std::string format(LogLevel level, const std::string& message, Args&&... args)
     {
-        return format(level, SourceLocation{}, message, std::forward<Args>(args)...);
+        return format(level, SourceLocation {}, message, std::forward<Args>(args)...);
     }
 
     /**
@@ -113,17 +112,18 @@ private:
     /**
      * @brief Formats the assembled log message string.
      */
-    [[nodiscard]] std::string formatMessage(LogLevel level, const SourceLocation& loc,
-                                            const std::string& formatted) const;
+    [[nodiscard]] std::string formatMessage(LogLevel level, const SourceLocation& loc, const std::string& formatted) const;
 
-    [[nodiscard]] std::string formatWithConfig(LogLevel level, const SourceLocation& loc,
-                                               const std::string& formatted) const;
+    [[nodiscard]] std::string formatWithConfig(LogLevel level, const SourceLocation& loc, const std::string& formatted) const;
 
     [[nodiscard]] static std::string formatFallback(LogLevel level, const std::string& formatted);
 
-    void appendField(std::vector<std::string>& parts, FieldType field,
-                     LogLevel level, const SourceLocation& loc,
-                     const std::string& formatted, bool& messageAdded) const;
+    void appendField(std::vector<std::string>& parts,
+                     FieldType field,
+                     LogLevel level,
+                     const SourceLocation& loc,
+                     const std::string& formatted,
+                     bool& messageAdded) const;
 
     /**
      * @brief Returns the current time formatted as HH:MM:SS.

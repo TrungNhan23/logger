@@ -88,13 +88,11 @@ TEST(SourceLocationTest, MacroCapturesFileAndLine)
     std::string output = testing::internal::GetCapturedStdout();
 
     // Should contain the test file name and a line number
-    EXPECT_TRUE(output.find("SourceLocationTest.cpp") != std::string::npos)
-        << "Expected file name in output, got: " << output;
+    EXPECT_TRUE(output.find("SourceLocationTest.cpp") != std::string::npos) << "Expected file name in output, got: " << output;
 
     // Should contain a line number (digits)
     std::regex lineRegex(R"(\d+)");
-    EXPECT_TRUE(std::regex_search(output, lineRegex))
-        << "Expected line number in output, got: " << output;
+    EXPECT_TRUE(std::regex_search(output, lineRegex)) << "Expected line number in output, got: " << output;
 
     std::remove(configPath.c_str());
 }

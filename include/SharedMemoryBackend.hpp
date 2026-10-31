@@ -40,14 +40,14 @@ constexpr const char* SHM_DEFAULT_NAME = "/logger_crash_buffer";
  */
 struct SharedMemoryHeader
 {
-    uint32_t magic;                    ///< Magic number for validation (SHM_MAGIC)
-    uint32_t version;                  ///< Layout version for compatibility checks
-    uint64_t capacity;                 ///< Size of the data buffer in bytes
-    uint64_t write_pos;                ///< Current write position in the ring buffer
-    uint64_t total_written;            ///< Total bytes ever written (for wrap detection)
-    uint32_t pid;                      ///< PID of the writer process
-    uint8_t wrapped;                   ///< Whether the buffer has wrapped around
-    std::array<uint8_t, 27> padding;   ///< Padding to 64 bytes for cache alignment
+    uint32_t magic; ///< Magic number for validation (SHM_MAGIC)
+    uint32_t version; ///< Layout version for compatibility checks
+    uint64_t capacity; ///< Size of the data buffer in bytes
+    uint64_t write_pos; ///< Current write position in the ring buffer
+    uint64_t total_written; ///< Total bytes ever written (for wrap detection)
+    uint32_t pid; ///< PID of the writer process
+    uint8_t wrapped; ///< Whether the buffer has wrapped around
+    std::array<uint8_t, 27> padding; ///< Padding to 64 bytes for cache alignment
 };
 
 static_assert(sizeof(SharedMemoryHeader) == 64, "SharedMemoryHeader must be 64 bytes");
@@ -83,9 +83,7 @@ public:
      * @param bufferSize Size of the ring buffer data area in bytes.
      * @throws std::runtime_error if shared memory cannot be created or mapped.
      */
-    explicit SharedMemoryBackend(
-        const std::string& shmName = SHM_DEFAULT_NAME,
-        size_t bufferSize = SHM_DEFAULT_BUFFER_SIZE);
+    explicit SharedMemoryBackend(const std::string& shmName = SHM_DEFAULT_NAME, size_t bufferSize = SHM_DEFAULT_BUFFER_SIZE);
 
     /**
      * @brief Destructor. Unmaps the shared memory region.

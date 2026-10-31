@@ -63,7 +63,7 @@ void intToStr(int value, char* buffer)
     }
 
     constexpr int MAX_DIGITS = 12;
-    std::array<char, MAX_DIGITS> tmp{};
+    std::array<char, MAX_DIGITS> tmp {};
     int idx = 0;
     bool negative = value < 0;
     if (negative)
@@ -98,12 +98,18 @@ const char* signalName(int signum)
 {
     switch (signum)
     {
-        case SIGSEGV: return "SIGSEGV (Segmentation fault)";
-        case SIGABRT: return "SIGABRT (Abort)";
-        case SIGBUS:  return "SIGBUS (Bus error)";
-        case SIGFPE:  return "SIGFPE (Floating point exception)";
-        case SIGILL:  return "SIGILL (Illegal instruction)";
-        default:      return "Unknown signal";
+        case SIGSEGV:
+            return "SIGSEGV (Segmentation fault)";
+        case SIGABRT:
+            return "SIGABRT (Abort)";
+        case SIGBUS:
+            return "SIGBUS (Bus error)";
+        case SIGFPE:
+            return "SIGFPE (Floating point exception)";
+        case SIGILL:
+            return "SIGILL (Illegal instruction)";
+        default:
+            return "Unknown signal";
     }
 }
 
@@ -117,7 +123,9 @@ void CrashHandler::install(std::shared_ptr<Logger> logger)
 
 void CrashHandler::install()
 {
-    struct sigaction sa{};
+    struct sigaction sa
+    {
+    };
     sa.sa_handler = signalHandler;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESETHAND;
@@ -139,7 +147,7 @@ void CrashHandler::signalHandler(int signum)
     safeWrite(STDERR_FILENO, signalName(signum));
     safeWrite(STDERR_FILENO, " (");
 
-    std::array<char, 16> sigBuf{};
+    std::array<char, 16> sigBuf {};
     intToStr(signum, sigBuf.data());
     safeWrite(STDERR_FILENO, sigBuf.data());
     safeWrite(STDERR_FILENO, ")\n");
@@ -147,7 +155,7 @@ void CrashHandler::signalHandler(int signum)
 #ifdef __linux__
     safeWrite(STDERR_FILENO, "\n--- Stack Trace ---\n");
 
-    std::array<void*, MAX_STACK_FRAMES> frames{};
+    std::array<void*, MAX_STACK_FRAMES> frames {};
     int depth = backtrace(frames.data(), MAX_STACK_FRAMES);
 
     backtrace_symbols_fd(frames.data(), depth, STDERR_FILENO);

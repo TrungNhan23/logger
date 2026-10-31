@@ -82,7 +82,7 @@ public:
      * all pending data is written. Default implementation is a no-op.
      * Backends with internal buffering (e.g., FileBackend) should override.
      */
-    virtual void flush() {}
+    virtual void flush() { }
 };
 
 } // namespace Helper::Logger

@@ -88,15 +88,11 @@ TEST(LogAssertionTest, FailingCondition_LogsMessage)
 
     // Read the log file produced by the child
     std::ifstream logFile("test_assertion_output.log");
-    std::string logContent((std::istreambuf_iterator<char>(logFile)),
-                            std::istreambuf_iterator<char>());
+    std::string logContent((std::istreambuf_iterator<char>(logFile)), std::istreambuf_iterator<char>());
 
-    EXPECT_NE(logContent.find("ASSERTION FAILED"), std::string::npos)
-        << "Log should contain 'ASSERTION FAILED', got: " << logContent;
-    EXPECT_NE(logContent.find("negative value: -1"), std::string::npos)
-        << "Log should contain the formatted message, got: " << logContent;
-    EXPECT_NE(logContent.find("[ERROR]"), std::string::npos)
-        << "Log should be at ERROR level, got: " << logContent;
+    EXPECT_NE(logContent.find("ASSERTION FAILED"), std::string::npos) << "Log should contain 'ASSERTION FAILED', got: " << logContent;
+    EXPECT_NE(logContent.find("negative value: -1"), std::string::npos) << "Log should contain the formatted message, got: " << logContent;
+    EXPECT_NE(logContent.find("[ERROR]"), std::string::npos) << "Log should be at ERROR level, got: " << logContent;
 
     // Cleanup
     std::remove("test_assertion_config.yaml");
@@ -140,14 +136,11 @@ TEST(LogAssertionTest, FailingCondition_IncludesConditionText)
     waitpid(pid, &status, 0);
 
     std::ifstream logFile("test_assertion_cond_output.log");
-    std::string logContent((std::istreambuf_iterator<char>(logFile)),
-                            std::istreambuf_iterator<char>());
+    std::string logContent((std::istreambuf_iterator<char>(logFile)), std::istreambuf_iterator<char>());
 
     // The stringified condition should appear in the log
-    EXPECT_NE(logContent.find("ptr != nullptr"), std::string::npos)
-        << "Log should contain the stringified condition, got: " << logContent;
-    EXPECT_NE(logContent.find("pointer is null"), std::string::npos)
-        << "Log should contain the user message, got: " << logContent;
+    EXPECT_NE(logContent.find("ptr != nullptr"), std::string::npos) << "Log should contain the stringified condition, got: " << logContent;
+    EXPECT_NE(logContent.find("pointer is null"), std::string::npos) << "Log should contain the user message, got: " << logContent;
 
     std::remove("test_assertion_cond.yaml");
     std::remove("test_assertion_cond_output.log");

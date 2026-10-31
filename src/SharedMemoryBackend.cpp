@@ -27,28 +27,21 @@ SharedMemoryBackend::SharedMemoryBackend(const std::string& shmName, size_t buff
 {
     if (m_shmFd == -1)
     {
-        throw std::runtime_error(
-            "SharedMemoryBackend: Failed to open shared memory '" + shmName +
-            "': " + std::strerror(errno));
+        throw std::runtime_error("SharedMemoryBackend: Failed to open shared memory '" + shmName + "': " + std::strerror(errno));
     }
 
     if (ftruncate(m_shmFd, static_cast<off_t>(m_totalSize)) == -1)
     {
         close(m_shmFd);
-        throw std::runtime_error(
-            "SharedMemoryBackend: Failed to set shared memory size: " +
-            std::string(std::strerror(errno)));
+        throw std::runtime_error("SharedMemoryBackend: Failed to set shared memory size: " + std::string(std::strerror(errno)));
     }
 
-    m_mappedRegion = mmap(nullptr, m_totalSize, PROT_READ | PROT_WRITE,
-                          MAP_SHARED, m_shmFd, 0);
+    m_mappedRegion = mmap(nullptr, m_totalSize, PROT_READ | PROT_WRITE, MAP_SHARED, m_shmFd, 0);
     // NOLINT(cppcoreguidelines-pro-type-cstyle-cast,performance-no-int-to-ptr)
     if (m_mappedRegion == MAP_FAILED)
     {
         close(m_shmFd);
-        throw std::runtime_error(
-            "SharedMemoryBackend: Failed to mmap shared memory: " +
-            std::string(std::strerror(errno)));
+        throw std::runtime_error("SharedMemoryBackend: Failed to mmap shared memory: " + std::string(std::strerror(errno)));
     }
 
     m_header = static_cast<SharedMemoryHeader*>(m_mappedRegion);
@@ -118,7 +111,9 @@ std::string SharedMemoryBackend::recoverLogs(const std::string& shmName)
         return "";
     }
 
-    struct stat sb{};
+    struct stat sb
+    {
+    };
     if (fstat(fd, &sb) == -1 || sb.st_size < static_cast<off_t>(sizeof(SharedMemoryHeader)))
     {
         close(fd);
@@ -173,13 +168,11 @@ bool SharedMemoryBackend::hasCrashLogs(const std::string& shmName)
         return false;
     }
 
-    SharedMemoryHeader header{};
+    SharedMemoryHeader header {};
     ssize_t bytesRead = read(fd, &header, sizeof(header));
     close(fd);
 
-    return (bytesRead == static_cast<ssize_t>(sizeof(header)) &&
-            header.magic == SHM_MAGIC &&
-            header.version == SHM_VERSION &&
+    return (bytesRead == static_cast<ssize_t>(sizeof(header)) && header.magic == SHM_MAGIC && header.version == SHM_VERSION &&
             header.total_written > 0);
 }
 
@@ -198,10 +191,16 @@ SharedMemoryBackend::SharedMemoryBackend(const std::string& /*shmName*/, size_t 
 }
 
 SharedMemoryBackend::~SharedMemoryBackend() = default;
-void SharedMemoryBackend::write(const std::string& /*formattedMsg*/) {}
-std::string SharedMemoryBackend::recoverLogs(const std::string& /*shmName*/) { return ""; }
-bool SharedMemoryBackend::hasCrashLogs(const std::string& /*shmName*/) { return false; }
-void SharedMemoryBackend::clearLogs(const std::string& /*shmName*/) {}
+void SharedMemoryBackend::write(const std::string& /*formattedMsg*/) { }
+std::string SharedMemoryBackend::recoverLogs(const std::string& /*shmName*/)
+{
+    return "";
+}
+bool SharedMemoryBackend::hasCrashLogs(const std::string& /*shmName*/)
+{
+    return false;
+}
+void SharedMemoryBackend::clearLogs(const std::string& /*shmName*/) { }
 
 #endif
 

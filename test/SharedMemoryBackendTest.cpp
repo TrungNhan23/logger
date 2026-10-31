@@ -28,9 +28,7 @@ protected:
 
 TEST_F(SharedMemoryBackendTest, Construction_CreatesSharedMemory)
 {
-    EXPECT_NO_THROW({
-        Helper::Logger::SharedMemoryBackend backend(TEST_SHM_NAME, 4096);
-    });
+    EXPECT_NO_THROW({ Helper::Logger::SharedMemoryBackend backend(TEST_SHM_NAME, 4096); });
 }
 
 TEST_F(SharedMemoryBackendTest, Write_DataPersistsAfterDestruction)
@@ -45,10 +43,8 @@ TEST_F(SharedMemoryBackendTest, Write_DataPersistsAfterDestruction)
     EXPECT_TRUE(Helper::Logger::SharedMemoryBackend::hasCrashLogs(TEST_SHM_NAME));
 
     std::string recovered = Helper::Logger::SharedMemoryBackend::recoverLogs(TEST_SHM_NAME);
-    EXPECT_NE(recovered.find("test message 1"), std::string::npos)
-        << "Should find message 1 in recovered logs: " << recovered;
-    EXPECT_NE(recovered.find("test message 2"), std::string::npos)
-        << "Should find message 2 in recovered logs: " << recovered;
+    EXPECT_NE(recovered.find("test message 1"), std::string::npos) << "Should find message 1 in recovered logs: " << recovered;
+    EXPECT_NE(recovered.find("test message 2"), std::string::npos) << "Should find message 2 in recovered logs: " << recovered;
 }
 
 TEST_F(SharedMemoryBackendTest, ClearLogs_RemovesSharedMemory)
@@ -101,8 +97,7 @@ TEST_F(SharedMemoryBackendTest, RingBuffer_WrapsCorrectly)
     // The exact messages depend on the wrap, but the recovered data should
     // be non-empty and contain valid text
     EXPECT_FALSE(recovered.empty()) << "Recovered logs should not be empty after wrapping";
-    EXPECT_NE(recovered.find("message number"), std::string::npos)
-        << "Should contain log message fragments: " << recovered;
+    EXPECT_NE(recovered.find("message number"), std::string::npos) << "Should contain log message fragments: " << recovered;
 }
 
 TEST_F(SharedMemoryBackendTest, MultipleWrites_PreserveOrder)

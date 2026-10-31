@@ -16,9 +16,12 @@ LogFormatter::LogFormatter(std::shared_ptr<LogFormatterConfigParser> configParse
 {
 }
 
-void LogFormatter::appendField(std::vector<std::string>& parts, FieldType field,
-                               LogLevel level, const SourceLocation& loc,
-                               const std::string& formatted, bool& messageAdded) const
+void LogFormatter::appendField(std::vector<std::string>& parts,
+                               FieldType field,
+                               LogLevel level,
+                               const SourceLocation& loc,
+                               const std::string& formatted,
+                               bool& messageAdded) const
 {
     switch (field)
     {
@@ -63,8 +66,7 @@ void LogFormatter::appendField(std::vector<std::string>& parts, FieldType field,
     }
 }
 
-std::string LogFormatter::formatWithConfig(LogLevel level, const SourceLocation& loc,
-                                           const std::string& formatted) const
+std::string LogFormatter::formatWithConfig(LogLevel level, const SourceLocation& loc, const std::string& formatted) const
 {
     const auto& fields = m_configParser->getFields();
     const std::string separator = fields.m_separator.value_or(" ");
@@ -105,8 +107,7 @@ std::string LogFormatter::formatFallback(LogLevel level, const std::string& form
     return oss.str();
 }
 
-std::string LogFormatter::formatMessage(LogLevel level, const SourceLocation& loc,
-                                        const std::string& formatted) const
+std::string LogFormatter::formatMessage(LogLevel level, const SourceLocation& loc, const std::string& formatted) const
 {
     if (m_configParser)
     {

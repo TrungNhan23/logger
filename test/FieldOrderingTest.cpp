@@ -17,9 +17,8 @@
  * Helper: Creates a temporary YAML config file with specified field order.
  * Returns the config file path.
  */
-static std::string createConfigWithFieldOrder(const std::string& filename,
-                                               const std::vector<std::string>& fields,
-                                               const std::string& separator = " | ")
+static std::string
+    createConfigWithFieldOrder(const std::string& filename, const std::vector<std::string>& fields, const std::string& separator = " | ")
 {
     std::ofstream config(filename);
     config << "logging:\n"
@@ -39,9 +38,7 @@ static std::string createConfigWithFieldOrder(const std::string& filename,
 
 TEST(FieldOrderingTest, TimestampModuleLevelMessage_DefaultOrder)
 {
-    auto configPath = createConfigWithFieldOrder(
-        "test_field_order_default.yaml",
-        {"timestamp", "module", "level", "message"});
+    auto configPath = createConfigWithFieldOrder("test_field_order_default.yaml", { "timestamp", "module", "level", "message" });
 
     auto logger = std::make_shared<Helper::Logger::Logger>(configPath);
     logger->setModuleName("TEST");
@@ -54,7 +51,7 @@ TEST(FieldOrderingTest, TimestampModuleLevelMessage_DefaultOrder)
 
     // Expected order: timestamp | module | level | message
     // Find positions of each component
-    auto posTimestamp = output.find(":");  // part of HH:MM:SS
+    auto posTimestamp = output.find(":"); // part of HH:MM:SS
     auto posModule = output.find("TEST");
     auto posLevel = output.find("[INFO]");
     auto posMessage = output.find("hello");
@@ -74,9 +71,7 @@ TEST(FieldOrderingTest, TimestampModuleLevelMessage_DefaultOrder)
 
 TEST(FieldOrderingTest, LevelTimestampMessage_ReversedOrder)
 {
-    auto configPath = createConfigWithFieldOrder(
-        "test_field_order_reversed.yaml",
-        {"level", "timestamp", "message"});
+    auto configPath = createConfigWithFieldOrder("test_field_order_reversed.yaml", { "level", "timestamp", "message" });
 
     auto logger = std::make_shared<Helper::Logger::Logger>(configPath);
     logger->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
@@ -87,7 +82,7 @@ TEST(FieldOrderingTest, LevelTimestampMessage_ReversedOrder)
     std::string output = testing::internal::GetCapturedStdout();
 
     auto posLevel = output.find("[INFO]");
-    auto posTimestamp = output.find(":");  // part of HH:MM:SS
+    auto posTimestamp = output.find(":"); // part of HH:MM:SS
     auto posMessage = output.find("reversed");
 
     EXPECT_NE(posLevel, std::string::npos);
@@ -103,9 +98,7 @@ TEST(FieldOrderingTest, LevelTimestampMessage_ReversedOrder)
 
 TEST(FieldOrderingTest, MessageOnly_MinimalOutput)
 {
-    auto configPath = createConfigWithFieldOrder(
-        "test_field_order_minimal.yaml",
-        {"message"});
+    auto configPath = createConfigWithFieldOrder("test_field_order_minimal.yaml", { "message" });
 
     auto logger = std::make_shared<Helper::Logger::Logger>(configPath);
     logger->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
@@ -118,17 +111,15 @@ TEST(FieldOrderingTest, MessageOnly_MinimalOutput)
     // Should contain the message but not timestamp or level brackets
     EXPECT_NE(output.find("minimal"), std::string::npos);
     // No timestamp (no colon pattern from HH:MM:SS) and no [INFO]
-    EXPECT_EQ(output.find("[INFO]"), std::string::npos)
-        << "Should not contain level when not in field order";
+    EXPECT_EQ(output.find("[INFO]"), std::string::npos) << "Should not contain level when not in field order";
 
     std::remove(configPath.c_str());
 }
 
 TEST(FieldOrderingTest, AllFields_IncludesEverything)
 {
-    auto configPath = createConfigWithFieldOrder(
-        "test_field_order_all.yaml",
-        {"timestamp", "level", "module", "thread_id", "file", "line", "message"});
+    auto configPath =
+        createConfigWithFieldOrder("test_field_order_all.yaml", { "timestamp", "level", "module", "thread_id", "file", "line", "message" });
 
     auto logger = std::make_shared<Helper::Logger::Logger>(configPath);
     logger->setModuleName("ALLFIELDS");
@@ -143,8 +134,7 @@ TEST(FieldOrderingTest, AllFields_IncludesEverything)
     EXPECT_NE(output.find("ALLFIELDS"), std::string::npos) << "Should contain module";
     EXPECT_NE(output.find("all fields test"), std::string::npos) << "Should contain message";
     // File name from LOG_DEBUG macro
-    EXPECT_NE(output.find("FieldOrderingTest.cpp"), std::string::npos)
-        << "Should contain source file name, got: " << output;
+    EXPECT_NE(output.find("FieldOrderingTest.cpp"), std::string::npos) << "Should contain source file name, got: " << output;
 
     std::remove(configPath.c_str());
 }
@@ -152,11 +142,7 @@ TEST(FieldOrderingTest, AllFields_IncludesEverything)
 TEST(FieldOrderingTest, HasField_Query)
 {
     Helper::Logger::LogFormat format;
-    format.m_fieldOrder = {
-        Helper::Logger::FieldType::Timestamp,
-        Helper::Logger::FieldType::Level,
-        Helper::Logger::FieldType::Message
-    };
+    format.m_fieldOrder = { Helper::Logger::FieldType::Timestamp, Helper::Logger::FieldType::Level, Helper::Logger::FieldType::Message };
 
     EXPECT_TRUE(format.hasField(Helper::Logger::FieldType::Timestamp));
     EXPECT_TRUE(format.hasField(Helper::Logger::FieldType::Level));
