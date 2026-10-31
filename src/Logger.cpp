@@ -53,12 +53,12 @@ Logger::Logger(std::string configFilePath)
 
 void Logger::setCurrentLevel(LogLevel level)
 {
-    m_level = level;
+    m_level.store(level, std::memory_order_relaxed);
 }
 
 LogLevel Logger::getCurrentLevel() const
 {
-    return m_level;
+    return m_level.load(std::memory_order_relaxed);
 }
 
 void Logger::setModuleName(const std::string& moduleName)
@@ -84,6 +84,18 @@ void Logger::addBackend(const std::shared_ptr<ILogBackend>& backend)
     {
         std::lock_guard<std::mutex> lock(m_logMutex);
         m_logBackends.push_back({ LogLevel::VERBOSE, backend });
+    }
+}
+
+void Logger::flushAll()
+{
+    std::lock_guard<std::mutex> lock(m_logMutex);
+    for (auto& backendEntry : m_logBackends)
+    {
+        if (backendEntry.backend)
+        {
+            backendEntry.backend->flush();
+        }
     }
 }
 

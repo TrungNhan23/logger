@@ -17,6 +17,7 @@ TEST(LoggerTest, GetInstance_ReturnSameInstance)
 
 TEST(LoggerTest, SetLevel_UpdateLevel)
 {
+    Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
     auto logger = Helper::Logger::defaultLogger();
     ASSERT_NE(logger, nullptr);
     logger->setCurrentLevel(Helper::Logger::LogLevel::DEBUG);
@@ -26,6 +27,7 @@ TEST(LoggerTest, SetLevel_UpdateLevel)
 
 TEST(LoggerTest, AddBackend_AddConsoleBackend)
 {
+    Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
     auto logger = Helper::Logger::defaultLogger();
     ASSERT_NE(logger, nullptr);
     auto backend = std::make_shared<Helper::Logger::ConsoleBackend>();

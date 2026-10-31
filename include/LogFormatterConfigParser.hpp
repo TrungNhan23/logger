@@ -1,5 +1,6 @@
 #pragma once // NOLINT(llvm-header-guard)
 
+#include <algorithm>
 #include <array>
 #include <map>
 #include <memory>
@@ -46,14 +47,34 @@ struct BackendConfig
 };
 
 /**
+ * @enum FieldType
+ * @brief Enumerates the types of fields that can appear in formatted log output.
+ *
+ * Used in LogFormat::m_fieldOrder to define the exact sequence of
+ * fields in the formatted log string.
+ */
+enum class FieldType
+{
+    Timestamp,
+    Level,
+    Module,
+    ThreadId,
+    File,
+    Line,
+    Function,
+    Message
+};
+
+/**
  * @struct LogFormat
- * @brief Represents a fully formatted log record including metadata.
+ * @brief Represents the formatting configuration for log output.
  *
- * This structure contains all contextual information required
- * to represent a log message after formatting.
+ * This structure defines which fields appear in the formatted log
+ * and in what order. The field ordering is determined by the
+ * sequence of entries in the YAML configuration's `fields:` list.
  *
- * It is typically produced by a LogFormatter and consumed
- * by a log backend (e.g., console, file, network).
+ * It is typically produced by LogFormatterConfigParser and consumed
+ * by LogFormatter to assemble the output string.
  */
 struct LogFormat
 {
@@ -63,49 +84,24 @@ struct LogFormat
     std::optional<std::string> m_separator;
 
     /**
-     * @brief Bool value that make decision whether to include timestamp in the formatted output.
+     * @brief Ordered sequence of fields to include in the formatted output.
      *
+     * The order of entries in this vector determines the exact order
+     * of fields in the formatted log string. Parsed from the YAML
+     * `fields:` list preserving declaration order.
      */
-    bool m_timestamp { false };
+    std::vector<FieldType> m_fieldOrder;
 
     /**
-     * @brief Bool value that make decision whether to include log level in the formatted output.
+     * @brief Check whether a specific field type is present in the field order.
      *
+     * @param ft The field type to check for.
+     * @return true if the field is in the order list, false otherwise.
      */
-    bool m_level { false };
-
-    /**
-     * @brief Bool value that make decision whether to include source file name in the formatted output.
-     *
-     * Typically provided using the __FILE__ macro.
-     */
-    bool m_file { false };
-
-    /**
-     * @brief Bool value that make decision whether to include source line number in the formatted output.
-     *
-     * Typically provided using the __LINE__ macro.
-     */
-    bool m_line { false };
-
-    /**
-     * @brief Final formatted log message content.
-     *
-     * Contains the user-provided message after
-     * printf-style formatting (if applicable).
-     */
-    std::string m_message;
-
-    /**
-     * @brief Bool value that make decision whether to include module name in the formatted output.
-     */
-    bool m_moduleName { false };
-
-    /**
-     * @brief Bool value that make decision whether to include thread ID in the formatted output.
-     */
-    bool m_threadId { false };
-
+    [[nodiscard]] bool hasField(FieldType ft) const
+    {
+        return std::find(m_fieldOrder.begin(), m_fieldOrder.end(), ft) != m_fieldOrder.end();
+    }
 };
 
 /**

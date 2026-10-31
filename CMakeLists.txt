@@ -41,6 +41,11 @@ target_link_libraries(
     better_enums
 )
 
+# Link platform-specific libraries
+if(UNIX)
+    target_link_libraries(logger_lib PUBLIC rt dl)
+endif()
+
 target_include_directories(logger_lib PUBLIC
     ${CMAKE_SOURCE_DIR}/include
     # ${CMAKE_SOURCE_DIR}/src
@@ -67,6 +72,11 @@ add_subdirectory(third-party/googletest)
 # Example executable
 # =========================================================
 add_subdirectory(example)
+
+# =========================================================
+# Enable testing with CTest
+# =========================================================
+enable_testing()
 
 # =========================================================
 # Add test folder AFTER coverage + gtest is ready

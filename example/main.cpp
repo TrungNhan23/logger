@@ -9,7 +9,8 @@
 void logMessagesWithLevelsVerbose()
 {
     auto lg = Helper::Logger::defaultLogger();
-    if (!lg) return;
+    if (!lg)
+        return;
     lg->setCurrentLevel(Helper::Logger::LogLevel::VERBOSE);
 
     LOG_INFO("Current log level is {} so this message should be logged", lg->getCurrentLevel()._to_string());
@@ -31,7 +32,8 @@ void logMessagesWithLevelsVerbose()
 void logMessagesWithLevelsInfo()
 {
     auto lg = Helper::Logger::defaultLogger();
-    if (!lg) return;
+    if (!lg)
+        return;
     lg->setCurrentLevel(Helper::Logger::LogLevel::INFO);
 
     LOG_INFO("Current log level is {} so this message should be logged", lg->getCurrentLevel()._to_string());
@@ -46,7 +48,8 @@ void logMessagesWithLevelsInfo()
 void logMessagesWithLevelsNone()
 {
     auto lg = Helper::Logger::defaultLogger();
-    if (!lg) return;
+    if (!lg)
+        return;
     lg->setCurrentLevel(Helper::Logger::LogLevel::NONE);
 
     LOG_DEBUG("This debug message should not be logged");
