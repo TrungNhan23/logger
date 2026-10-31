@@ -74,6 +74,11 @@ add_subdirectory(third-party/googletest)
 add_subdirectory(example)
 
 # =========================================================
+# Enable testing with CTest
+# =========================================================
+enable_testing()
+
+# =========================================================
 # Add test folder AFTER coverage + gtest is ready
 # =========================================================
 add_subdirectory(test)

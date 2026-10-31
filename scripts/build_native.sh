@@ -53,16 +53,21 @@ build() {
     CLICOLOR_FORCE=1 cmake --build "${BUILD_DIR}" -- -j"${THREADS}" 2>&1 | colorize_output
 }
 
-run()
+run_examples()
 {
     if [ -x "build/example/main_logger" ]; then
         echo_green "Running build/example/main_logger"
         ./build/example/main_logger
     fi
+}
 
-    if [ -x "build/test/test_logger" ]; then
-        echo_green "Running build/test/test_logger"
-        ./build/test/test_logger
+run_tests()
+{
+    echo_green "== Run Unit Tests with CTest =="
+    if ctest --help | grep -q -- '--test-dir'; then
+        ctest --test-dir "${BUILD_DIR}" --output-on-failure
+    else
+        (cd "${BUILD_DIR}" && ctest --output-on-failure)
     fi
 }
 
@@ -88,7 +93,11 @@ parse_options()
             build
             ;;
         run)
-            run
+            run_examples
+            run_tests
+            ;;
+        test|tests|ut|unit_tests)
+            run_tests
             ;;
         stress|bench|benchmark)
             configure
@@ -98,17 +107,19 @@ parse_options()
         build_and_run)
             configure
             build
-            run
+            run_examples
+            run_tests
             ;;    
         all)
             configure
             lint
             build
-            run
+            run_examples
+            run_tests
             stress
             ;;
         *)
-            echo "Usage: $0 { configure | lint | build | run | stress | build_and_run | all }"
+            echo "Usage: $0 { configure | lint | build | run | test | ut | stress | build_and_run | all }"
             exit 1
             ;;
     esac

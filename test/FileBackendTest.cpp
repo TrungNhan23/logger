@@ -7,6 +7,7 @@
 TEST(FileBackendTest, Write_CallsWriteMethod)
 {
     std::string filename = "testLogFile.log";
+    std::remove(filename.c_str());
 
     // ensure a default logger exists via provider
     Helper::Logger::setDefaultLogger(std::make_shared<Helper::Logger::Logger>(""));
@@ -27,4 +28,5 @@ TEST(FileBackendTest, Write_CallsWriteMethod)
     std::string output = buffer.str();
 
     EXPECT_NE(output.find(testMessage), std::string::npos);
+    std::remove(filename.c_str());
 }
